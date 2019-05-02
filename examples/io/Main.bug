@@ -1,0 +1,10 @@
+import System::Math;
+import System::Input;
+import System::Output;
+
+export function main(): void {
+    let a = Input.readInt();
+    let b = Input.readInt();
+
+    Output.println(value=`Your answer is: ${a + b}`);
+}

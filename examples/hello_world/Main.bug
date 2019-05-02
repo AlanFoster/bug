@@ -1,0 +1,5 @@
+import System::Output;
+
+export function main(): void {
+    Output.println(value=`Hello world`);
+}

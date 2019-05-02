@@ -1,0 +1,35 @@
+import System::Math;
+import System::Output;
+import System::Collections::List;
+
+export data Vector(x: i32, y: i32) {
+    function add(self: Vector, other: Vector): Vector {
+        Vector(x = self.x + other.x, y = self.y + other.y);
+    }
+}
+
+export data Particle(position: Vector, velocity: Vector, acceleration: Vector)
+
+export function main(): void {
+    let particles = [];
+    for _index, _value in range(start = 1, end = 20) {
+        let particle = Particle(
+             position = Vector(
+                x = Math.random() * 100,
+                y = Math.random() * 100
+             ),
+             velocity = Vector(
+                x = Math.random(),
+                y = Math.random()
+             ),
+             acceleration = Vector(
+                x = 0,
+                y = 0
+            )
+        );
+        particles.push(value=particle);
+    }
+
+    Output.println(value=particles);
+}
+

@@ -1,0 +1,16 @@
+import System::Input;
+import System::Output;
+
+export function main(): void {
+    let array = [];
+    Output.println(value=`How many values would you like to input?`);
+    let numberOfValues = Input.readInt();
+
+    for index, _ in range(start=0, end=numberOfValues) {
+        Output.println(value=`Input number ${index + 1}:`);
+        array.push(value=Input.readInt());
+    }
+
+    let average = array.sum() / numberOfValues;
+    Output.println(value=`The average is: ${average}`);
+}
