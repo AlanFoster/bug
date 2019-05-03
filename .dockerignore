@@ -1,0 +1,12 @@
+*
+
+!examples
+!compiler
+!parser
+!tests
+!BugLexer.g4
+!BugLexer.tokens
+!BugParser.g4
+!Pipfile
+!Pipfile.lock
+!setup.cfg

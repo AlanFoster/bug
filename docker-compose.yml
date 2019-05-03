@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  service: &default
+    build: .
+    volumes:
+      - ./:/app
+
+  test:
+    <<: *default
+    command: >
+      pytest
+        -vv
+        --black
+        --flake8
