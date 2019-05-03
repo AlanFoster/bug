@@ -1,19 +1,31 @@
 import antlr4
+from wasm.model import Module, Func, BinaryOperation, Call, Param, Const
 
 
 def generate(input_stream: antlr4.InputStream) -> str:
-    return """
-(module
-    (func $output_println (import "System::Output" "println") (param i32))
-
-    (func (export "Main")
-        (i32.add
-            (i32.const 1)
-            (i32.mul
-                (i32.const 2)
-                (i32.const 3))
-        )
-        call $output_println
+    return Module(
+        [
+            Func(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            ),
+            Func(
+                export="Main",
+                instructions=[
+                    BinaryOperation(
+                        op="i32.add",
+                        left=[Const(val_type="i32", val="1")],
+                        right=[
+                            BinaryOperation(
+                                op="i32.mul",
+                                left=[Const(val_type="i32", val="2")],
+                                right=[Const(val_type="i32", val="3")],
+                            )
+                        ],
+                    ),
+                    Call(var="$output_println"),
+                ],
+            ),
+        ]
     )
-)
-"""
