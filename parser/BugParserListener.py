@@ -98,6 +98,15 @@ class BugParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BugParser#statementExpression.
+    def enterStatementExpression(self, ctx:BugParser.StatementExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#statementExpression.
+    def exitStatementExpression(self, ctx:BugParser.StatementExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by BugParser#forLoop.
     def enterForLoop(self, ctx:BugParser.ForLoopContext):
         pass
@@ -161,12 +170,57 @@ class BugParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by BugParser#expression.
-    def enterExpression(self, ctx:BugParser.ExpressionContext):
+    # Enter a parse tree produced by BugParser#binaryExpression.
+    def enterBinaryExpression(self, ctx:BugParser.BinaryExpressionContext):
         pass
 
-    # Exit a parse tree produced by BugParser#expression.
-    def exitExpression(self, ctx:BugParser.ExpressionContext):
+    # Exit a parse tree produced by BugParser#binaryExpression.
+    def exitBinaryExpression(self, ctx:BugParser.BinaryExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#callExpression.
+    def enterCallExpression(self, ctx:BugParser.CallExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#callExpression.
+    def exitCallExpression(self, ctx:BugParser.CallExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#variableNameExpression.
+    def enterVariableNameExpression(self, ctx:BugParser.VariableNameExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#variableNameExpression.
+    def exitVariableNameExpression(self, ctx:BugParser.VariableNameExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#nestedExpression.
+    def enterNestedExpression(self, ctx:BugParser.NestedExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#nestedExpression.
+    def exitNestedExpression(self, ctx:BugParser.NestedExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#unaryExpression.
+    def enterUnaryExpression(self, ctx:BugParser.UnaryExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#unaryExpression.
+    def exitUnaryExpression(self, ctx:BugParser.UnaryExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#literalExpression.
+    def enterLiteralExpression(self, ctx:BugParser.LiteralExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#literalExpression.
+    def exitLiteralExpression(self, ctx:BugParser.LiteralExpressionContext):
         pass
 
 

@@ -8,7 +8,7 @@ Work in progress language that is most likely filled with bugs.
 
 ```bash
 docker-compose build
-docker-compose run --rm service /bin/sh /usr/local/bin/antlr4 BugParser.g4 -Dlanguage=Python3 -visitor -o parser
+docker-compose run --rm service /bin/sh /usr/local/bin/antlr4 BugParser.g4 BugLexer.g4 -Dlanguage=Python3 -visitor -o parser
 ```
 
 Unfortunately the generated method names are camel case, rather than snake case - as shown within the python3 codegen

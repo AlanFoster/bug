@@ -50,8 +50,8 @@ class Operation(Instruction):
 @dataclass
 class BinaryOperation(Operation):
     op: str
-    left: List[Operation]
-    right: List[Operation]
+    left: Operation
+    right: Operation
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visitBinaryOperation(self)
@@ -69,6 +69,7 @@ class Const(Operation):
 @dataclass
 class Call(Operation):
     var: str
+    arguments: List[Instruction]
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visitCall(self)

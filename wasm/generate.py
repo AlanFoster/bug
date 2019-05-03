@@ -30,10 +30,10 @@ class WasmPrinter(WasmVisitor):
         if func.import_:
             imports = " ".join([f'"{name}"' for name in func.import_])
 
-            result += self.with_indentation(f"(import {imports})\n")
+            result += self.with_indentation(f"(import {imports})") + "\n"
 
         if func.export:
-            result += self.with_indentation(f'(export "{func.export}")\n')
+            result += self.with_indentation(f'(export "{func.export}")') + "\n"
 
         if func.params:
             for param in func.params:
@@ -51,16 +51,11 @@ class WasmPrinter(WasmVisitor):
         result = self.with_indentation(f"({binary_operation.op}\n")
 
         self.indentation += 1
-        for instruction in binary_operation.left:
-            result += instruction.accept(self)
+        result += binary_operation.left.accept(self)
+        result += binary_operation.right.accept(self)
         self.indentation -= 1
 
-        self.indentation += 1
-        for instruction in binary_operation.right:
-            result += instruction.accept(self)
-        self.indentation -= 1
-
-        result += self.with_indentation(")\n")
+        result += self.with_indentation(")") + "\n"
 
         return result
 
@@ -68,7 +63,17 @@ class WasmPrinter(WasmVisitor):
         return self.with_indentation(f"({const.val_type}.const {const.val})") + "\n"
 
     def visitCall(self, call: Call):
-        return self.with_indentation(f"(call {call.var})") + "\n"
+        result = self.with_indentation("(call\n")
+
+        self.indentation += 1
+        result += self.with_indentation(call.var) + "\n"
+        for instruction in call.arguments:
+            result += instruction.accept(self)
+        self.indentation -= 1
+
+        result += self.with_indentation(")") + "\n"
+
+        return result
 
     def with_indentation(self, str):
         return ("    " * self.indentation) + str

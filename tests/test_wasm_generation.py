@@ -13,18 +13,20 @@ def test_simple_expression(snapshot):
             Func(
                 export="Main",
                 instructions=[
-                    BinaryOperation(
-                        op="i32.add",
-                        left=[Const(val_type="i32", val="1")],
-                        right=[
+                    Call(
+                        var="$output_println",
+                        arguments=[
                             BinaryOperation(
-                                op="i32.mul",
-                                left=[Const(val_type="i32", val="2")],
-                                right=[Const(val_type="i32", val="3")],
+                                op="i32.add",
+                                left=Const(val_type="i32", val="1"),
+                                right=BinaryOperation(
+                                    op="i32.mul",
+                                    left=Const(val_type="i32", val="2"),
+                                    right=Const(val_type="i32", val="3"),
+                                ),
                             )
                         ],
-                    ),
-                    Call(var="$output_println"),
+                    )
                 ],
             ),
         ]

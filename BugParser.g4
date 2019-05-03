@@ -3,11 +3,11 @@ parser grammar BugParser;
 options { tokenVocab=BugLexer; }
 
 program:
-    importStatements*? (data | functionDef)*
+    importStatements (data | functionDef)*
     EOF
     ;
 
-importStatements: importStatement;
+importStatements: importStatement*;
 importStatement: 'import' variableName ('::' variableName)* ';' ;
 
 functionDef:
@@ -30,8 +30,10 @@ statements: statement*;
 statement:
     forLoop
     | letStatement
-    | expression ';'
+    | statementExpression
     ;
+
+statementExpression: expression ';' ;
 
 forLoop:
     'for' variableName ',' variableName 'in' expression '{' statements '}' ;
@@ -48,16 +50,19 @@ functionName: IDENTIFIER ;
 variableName: IDENTIFIER ;
 
 expression:
-    operator=(SUB | NOT) expression
-    | left=expression operator=(MUL | DIV) right=expression
-    | left=expression operator=(ADD | SUB) right=expression
-    | variableName
-    | literal
-    | expression '(' argumentList? ')' // # CallExpression
-    | expression '.' variableName
-    | '[' ']'
-    | '(' expression ')'
+    operator=(SUB | NOT) expression                         # unaryExpression
+    | left=expression operator=(MUL | DIV) right=expression # binaryExpression
+    | left=expression operator=(ADD | SUB) right=expression # binaryExpression
+    | left=expression operator=(LT | GT) right=expression   # binaryExpression
+    | left=expression operator=AND right=expression         # binaryExpression
+    | left=expression operator=OR right=expression          # binaryExpression
+    | left=expression operator=EQ right=expression          # binaryExpression
+    | variableName                                          # variableNameExpression
+    | literal                                               # literalExpression
+    | expression '(' argumentList? ')'                      # callExpression
+    | '(' expression ')'                                    # nestedExpression
     ;
+//    | expression '.' variableName                           #
 
 literal:
     INTEGER

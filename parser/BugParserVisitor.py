@@ -59,6 +59,14 @@ class BugParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by BugParser#statementExpression.
+    def visitStatementExpression(self, ctx:BugParser.StatementExpressionContext):
+        return self.visitChildren(ctx)
+
+    # Visit a parse tree produced by BugParser#statementExpression.
+    def visitStatementExpression(self, ctx: BugParser.StatementExpressionContext):
+        return self.visit(ctx.expression())
+
     # Visit a parse tree produced by BugParser#forLoop.
     def visitForLoop(self, ctx:BugParser.ForLoopContext):
         return self.visitChildren(ctx)
@@ -94,8 +102,33 @@ class BugParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by BugParser#expression.
-    def visitExpression(self, ctx:BugParser.ExpressionContext):
+    # Visit a parse tree produced by BugParser#binaryExpression.
+    def visitBinaryExpression(self, ctx:BugParser.BinaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BugParser#callExpression.
+    def visitCallExpression(self, ctx:BugParser.CallExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BugParser#variableNameExpression.
+    def visitVariableNameExpression(self, ctx:BugParser.VariableNameExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BugParser#nestedExpression.
+    def visitNestedExpression(self, ctx:BugParser.NestedExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BugParser#unaryExpression.
+    def visitUnaryExpression(self, ctx:BugParser.UnaryExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by BugParser#literalExpression.
+    def visitLiteralExpression(self, ctx:BugParser.LiteralExpressionContext):
         return self.visitChildren(ctx)
 
 
