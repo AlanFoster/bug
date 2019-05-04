@@ -24,15 +24,15 @@ def test_simple_expression():
                 export="Main",
                 instructions=[
                     Call(
-                        var="$output_println",
+                        name="$output_println",
                         arguments=[
                             BinaryOperation(
                                 op="i32.add",
-                                left=Const(val_type="i32", val="1"),
+                                left=Const(type="i32", val="1"),
                                 right=BinaryOperation(
                                     op="i32.mul",
-                                    left=Const(val_type="i32", val="2"),
-                                    right=Const(val_type="i32", val="3"),
+                                    left=Const(type="i32", val="2"),
+                                    right=Const(type="i32", val="3"),
                                 ),
                             )
                         ],

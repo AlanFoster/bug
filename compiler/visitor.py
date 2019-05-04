@@ -124,7 +124,7 @@ class Visitor(BugParserVisitor):
         else:
             raise NotImplementedError(f"{function_name} not supported")
         arguments = self.visit(ctx.argumentList())
-        return Call(var=function_name, arguments=arguments)
+        return Call(name=function_name, arguments=arguments)
 
     # Visit a parse tree produced by BugParser#variableNameExpression.
     def visitVariableNameExpression(self, ctx: BugParser.VariableNameExpressionContext):
@@ -145,7 +145,7 @@ class Visitor(BugParserVisitor):
     # Visit a parse tree produced by BugParser#literal.
     def visitLiteral(self, ctx: BugParser.LiteralContext):
         if ctx.INTEGER():
-            return Const(val_type="i32", val=ctx.INTEGER().getText())
+            return Const(type="i32", val=ctx.INTEGER().getText())
         else:
             raise NotImplementedError(f"literal {ctx.getText()} not implemented")
 
