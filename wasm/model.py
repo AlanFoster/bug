@@ -30,6 +30,16 @@ class Param:
 
 @dataclass
 class Func(Instruction):
+    """
+    ( func <signature> <locals> <body> )
+    ( func (param i32) (param i32) (result f64) (local f64) (local i32) ... )
+    Absence of result indicates no return value
+
+    Reference locals with `get_local 0`, `get_local 1`, or more readable:
+    ( func (param $p1 i32) (param $p2 i32) (result f64) (local $a f64) (local $b i32) ... )
+    Reference locals with `get_local $p1`, `get_local $a`
+    """
+
     name: Optional[str] = None
     export: Optional[str] = None
     # import_: Optional[(str, str)] = None
@@ -68,6 +78,11 @@ class Const(Operation):
 
 @dataclass
 class Call(Operation):
+    """
+    `call` is used for static calls, i.e. where the function name is known ahead of time.
+    `call_indirect` can be used when the function to call is on the stack.
+    """
+
     var: str
     arguments: List[Instruction]
 

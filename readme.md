@@ -4,6 +4,10 @@ Work in progress language that is most likely filled with bugs.
 
 ## Notes
 
+## Resources
+
+- [Understanding the wasm text format](https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format)
+
 ### Generate parser
 
 ```bash
