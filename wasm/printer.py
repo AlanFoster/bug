@@ -17,7 +17,7 @@ class WasmPrinter(WasmVisitor):
     def __init__(self):
         self.indentation = 0
 
-    def visitModule(self, module: Module):
+    def visit_module(self, module: Module):
         result = "(module\n"
 
         self.indentation += 1
@@ -28,7 +28,7 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
-    def visitParam(self, param: Param):
+    def visit_param(self, param: Param):
         result = "(param "
 
         if param.name:
@@ -39,7 +39,7 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
-    def visitFunc(self, func: Func):
+    def visit_func(self, func: Func):
         result = self.with_indentation("(func")
 
         if func.name:
@@ -79,7 +79,7 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
-    def visitBinaryOperation(self, binary_operation: BinaryOperation):
+    def visit_binary_operation(self, binary_operation: BinaryOperation):
         result = self.with_indentation(f"({binary_operation.op}\n")
 
         self.indentation += 1
@@ -91,16 +91,16 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
-    def visitResult(self, result: Result):
+    def visit_result(self, result: Result):
         return f"(result {result.type})"
 
-    def visitConst(self, const: Const):
+    def visit_const(self, const: Const):
         return self.with_indentation(f"({const.type}.const {const.val})") + "\n"
 
-    def visitLocal(self, local: Local):
+    def visit_local(self, local: Local):
         return self.with_indentation(f"(local {local.name} {local.type})")
 
-    def visitSetLocal(self, set_local: SetLocal):
+    def visit_set_local(self, set_local: SetLocal):
         result = self.with_indentation(f"(set_local {set_local.name}") + "\n"
 
         self.indentation += 1
@@ -111,10 +111,10 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
-    def visitGetLocal(self, get_local: GetLocal):
+    def visit_get_local(self, get_local: GetLocal):
         return self.with_indentation(f"(get_local {get_local.name})") + "\n"
 
-    def visitCall(self, call: Call):
+    def visit_call(self, call: Call):
         result = self.with_indentation("(call\n")
 
         self.indentation += 1

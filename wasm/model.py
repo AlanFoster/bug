@@ -18,7 +18,7 @@ class Module:
     instructions: List[Instruction]
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitModule(self)
+        return visitor.visit_module(self)
 
 
 @dataclass
@@ -27,7 +27,7 @@ class Param:
     name: str = None
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitParam(self)
+        return visitor.visit_param(self)
 
 
 @dataclass
@@ -36,7 +36,7 @@ class Local:
     name: str
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitLocal(self)
+        return visitor.visit_local(self)
 
 
 @dataclass
@@ -44,7 +44,7 @@ class Result:
     type: str
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitResult(self)
+        return visitor.visit_result(self)
 
 
 @dataclass
@@ -68,7 +68,7 @@ class Func(Instruction):
     instructions: List[Instruction] = None
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitFunc(self)
+        return visitor.visit_func(self)
 
 
 @dataclass
@@ -78,7 +78,7 @@ class BinaryOperation(Instruction):
     right: Instruction
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitBinaryOperation(self)
+        return visitor.visit_binary_operation(self)
 
 
 @dataclass
@@ -86,7 +86,7 @@ class GetLocal(Instruction):
     name: str
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitGetLocal(self)
+        return visitor.visit_get_local(self)
 
 
 @dataclass
@@ -95,7 +95,7 @@ class SetLocal(Instruction):
     val: Instruction
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitSetLocal(self)
+        return visitor.visit_set_local(self)
 
 
 @dataclass
@@ -104,7 +104,7 @@ class Const(Instruction):
     val: str
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitConst(self)
+        return visitor.visit_const(self)
 
 
 @dataclass
@@ -118,46 +118,46 @@ class Call(Instruction):
     arguments: List[Instruction]
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visitCall(self)
+        return visitor.visit_call(self)
 
 
 class WasmVisitor:
     @abstractmethod
-    def visitModule(self, module: Module):
+    def visit_module(self, module: Module):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitParam(self, param: Param):
+    def visit_param(self, param: Param):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitResult(self, result: Result):
+    def visit_result(self, result: Result):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitLocal(self, param: Local):
+    def visit_local(self, param: Local):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitGetLocal(self, param: GetLocal):
+    def visit_get_local(self, param: GetLocal):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitSetLocal(self, local: SetLocal):
+    def visit_set_local(self, local: SetLocal):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitFunc(self, func: Func):
+    def visit_func(self, func: Func):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitBinaryOperation(self, binary_operation: BinaryOperation):
+    def visit_binary_operation(self, binary_operation: BinaryOperation):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitConst(self, const: Const):
+    def visit_const(self, const: Const):
         raise NotImplementedError()
 
     @abstractmethod
-    def visitCall(self, call: Call):
+    def visit_call(self, call: Call):
         raise NotImplementedError()
