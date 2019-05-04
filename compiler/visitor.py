@@ -1,6 +1,17 @@
+from compiler.symbol_table import EmptySymbolTable, Symbol, SymbolType
 from parser.BugParser import BugParser
 from parser.BugParserVisitor import BugParserVisitor
-from wasm.model import Module, Func, BinaryOperation, Call, Param, Const
+from wasm.model import (
+    Module,
+    Func,
+    BinaryOperation,
+    Call,
+    Param,
+    Const,
+    SetLocal,
+    GetLocal,
+    Local,
+)
 
 
 def get_binary_operator(op):
@@ -13,11 +24,16 @@ def get_binary_operator(op):
 
 
 class Visitor(BugParserVisitor):
+    def __init__(self):
+        self.symbol_table: EmptySymbolTable = EmptySymbolTable()
 
     # Visit a parse tree produced by BugParser#program.
     def visitProgram(self, ctx: BugParser.ProgramContext):
         imports = self.visit(ctx.importStatements())
-        functions = [self.visit(function) for function in ctx.functionDef()]
+
+        functions = []
+        for function in ctx.functionDef():
+            functions.append(self.visit(function))
 
         instructions = []
         instructions += imports
@@ -46,10 +62,18 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#functionDef.
     def visitFunctionDef(self, ctx: BugParser.FunctionDefContext):
+
+        self.symbol_table = self.symbol_table.enter_scope()
         body = self.visit(ctx.functionBody())
+        # Note, locals will be populated after visiting the function body
+        locals_ = []
+        for local in self.symbol_table.locals():
+            locals_.append(Local(type=local.type, name=local.generated_name))
+        self.symbol_table = self.symbol_table.exit_scope()
 
         return Func(
             export=ctx.functionName().getText() if ctx.EXPORT() else None,
+            locals=locals_,
             instructions=body,
         )
 
@@ -85,7 +109,14 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#letStatement.
     def visitLetStatement(self, ctx: BugParser.LetStatementContext):
-        raise NotImplementedError()
+        expression = self.visit(ctx.expression())
+        var_name = ctx.variableName().getText()
+        # TODO: Assignments should infer the expression type / support explicit types: `let a: i32 = expression;`
+        type = "i32"
+        symbol = Symbol(name=var_name, type=type, kind=SymbolType.LOCAL)
+        self.symbol_table.add(symbol)
+
+        return SetLocal(name=symbol.generated_name, val=expression)
 
     # Visit a parse tree produced by BugParser#returnTypeName.
     def visitReturnTypeName(self, ctx: BugParser.ReturnTypeNameContext):
@@ -128,7 +159,10 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#variableNameExpression.
     def visitVariableNameExpression(self, ctx: BugParser.VariableNameExpressionContext):
-        raise NotImplementedError()
+        var_name = ctx.variableName().getText()
+        symbol = self.symbol_table.get(var_name)
+
+        return GetLocal(name=symbol.generated_name)
 
     # Visit a parse tree produced by BugParser#nestedExpression.
     def visitNestedExpression(self, ctx: BugParser.NestedExpressionContext):
