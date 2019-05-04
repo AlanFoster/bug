@@ -11,6 +11,7 @@ from wasm.model import (
     SetLocal,
     GetLocal,
     Local,
+    Result,
 )
 
 
@@ -29,6 +30,8 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#program.
     def visitProgram(self, ctx: BugParser.ProgramContext):
+        self.symbol_table = self.symbol_table.enter_scope()
+
         imports = self.visit(ctx.importStatements())
 
         functions = []
@@ -38,6 +41,7 @@ class Visitor(BugParserVisitor):
         instructions = []
         instructions += imports
         instructions += functions
+        self.symbol_table = self.symbol_table.exit_scope()
         return Module(instructions=instructions)
 
     # Visit a parse tree produced by BugParser#importStatements.
@@ -62,17 +66,41 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#functionDef.
     def visitFunctionDef(self, ctx: BugParser.FunctionDefContext):
+        # Place the current function into the symbol table so that it can be called by
+        # other functions later, or recursively if required.
+        function_name = ctx.functionName().getText()
+        return_type = ctx.returnTypeName().getText()
+        function_symbol = Symbol(
+            name=function_name, type=return_type, kind=SymbolType.FUNC
+        )
+        self.symbol_table.add(function_symbol)
 
         self.symbol_table = self.symbol_table.enter_scope()
+
+        # Populate the required params into the symbol table before compiling the function body
+        params = []
+        if ctx.parameterList():
+            for param in ctx.parameterList().params:
+                var_name = param.variableName().getText()
+                type_ = param.typeName().getText()
+                symbol = Symbol(name=var_name, type=type_, kind=SymbolType.PARAM)
+                self.symbol_table.add(symbol)
+                params.append(Param(type=symbol.type, name=symbol.generated_name))
         body = self.visit(ctx.functionBody())
+
         # Note, locals will be populated after visiting the function body
         locals_ = []
-        for local in self.symbol_table.locals():
-            locals_.append(Local(type=local.type, name=local.generated_name))
+        for symbol in self.symbol_table.locals():
+            locals_.append(Local(type=symbol.type, name=symbol.generated_name))
         self.symbol_table = self.symbol_table.exit_scope()
 
         return Func(
-            export=ctx.functionName().getText() if ctx.EXPORT() else None,
+            # Note: The function name is the internally generated name for this module
+            name=function_symbol.generated_name,
+            # Note: The export name is the original function name
+            export=function_name if ctx.EXPORT() else None,
+            params=params,
+            result=None if return_type == "void" else Result(type=return_type),
             locals=locals_,
             instructions=body,
         )
@@ -103,6 +131,10 @@ class Visitor(BugParserVisitor):
     def visitStatement(self, ctx: BugParser.StatementContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by BugParser#statementExpression.
+    def visitStatementExpression(self, ctx: BugParser.StatementExpressionContext):
+        return self.visit(ctx.expression())
+
     # Visit a parse tree produced by BugParser#forLoop.
     def visitForLoop(self, ctx: BugParser.ForLoopContext):
         raise NotImplementedError()
@@ -110,10 +142,10 @@ class Visitor(BugParserVisitor):
     # Visit a parse tree produced by BugParser#letStatement.
     def visitLetStatement(self, ctx: BugParser.LetStatementContext):
         expression = self.visit(ctx.expression())
-        var_name = ctx.variableName().getText()
+        varable_name = ctx.variableName().getText()
         # TODO: Assignments should infer the expression type / support explicit types: `let a: i32 = expression;`
-        type = "i32"
-        symbol = Symbol(name=var_name, type=type, kind=SymbolType.LOCAL)
+        type_ = "i32"
+        symbol = Symbol(name=varable_name, type=type_, kind=SymbolType.LOCAL)
         self.symbol_table.add(symbol)
 
         return SetLocal(name=symbol.generated_name, val=expression)
@@ -152,15 +184,21 @@ class Visitor(BugParserVisitor):
         # Note: This will need to use a real symbol table in the future
         if function_name == "println":
             function_name = "$output_println"
+        elif self.symbol_table.has(function_name):
+            symbol = self.symbol_table.get(function_name)
+            if symbol.kind is not SymbolType.FUNC:
+                raise NotImplementedError(f"{function_name} is not a function")
+
+            function_name = symbol.generated_name
         else:
             raise NotImplementedError(f"{function_name} not supported")
-        arguments = self.visit(ctx.argumentList())
+        arguments = self.visit(ctx.argumentList()) if ctx.argumentList() else []
         return Call(name=function_name, arguments=arguments)
 
     # Visit a parse tree produced by BugParser#variableNameExpression.
     def visitVariableNameExpression(self, ctx: BugParser.VariableNameExpressionContext):
-        var_name = ctx.variableName().getText()
-        symbol = self.symbol_table.get(var_name)
+        variable_name = ctx.variableName().getText()
+        symbol = self.symbol_table.get(variable_name)
 
         return GetLocal(name=symbol.generated_name)
 

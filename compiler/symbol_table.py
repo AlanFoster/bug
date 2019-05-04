@@ -7,6 +7,8 @@ from typing import Dict, Optional
 @dataclass
 class SymbolType(Enum):
     LOCAL = 1
+    PARAM = 2
+    FUNC = 3
 
 
 @dataclass
@@ -45,6 +47,9 @@ class EmptySymbolTable(SymbolTable):
     def get(self, name):
         raise ValueError(f"Missing variable '{name}'.")
 
+    def has(self, name):
+        return False
+
     def enter_scope(self):
         return ChildSymbolTable(self)
 
@@ -65,6 +70,12 @@ class ChildSymbolTable(SymbolTable):
     def get(self, name: str):
         if name in self.symbols:
             return self.symbols[name]
+
+        return self.parent.get(name)
+
+    def has(self, name: str):
+        if name in self.symbols:
+            return True
 
         return self.parent.get(name)
 

@@ -42,7 +42,7 @@ letStatement: 'let' variableName '=' expression ';';
 
 returnTypeName: 'void' | typeName;
 
-parameterList: typedVariable (',' typedVariable)* ;
+parameterList: params+=typedVariable (',' params+=typedVariable)* ;
 
 typedVariable: variableName ':' typeName ;
 

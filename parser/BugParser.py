@@ -1252,6 +1252,8 @@ class BugParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
+            self._typedVariable = None # TypedVariableContext
+            self.params = list() # of TypedVariableContexts
 
         def typedVariable(self, i:int=None):
             if i is None:
@@ -1294,7 +1296,8 @@ class BugParser ( Parser ):
         try:
             self.enterOuterAlt(localctx, 1)
             self.state = 157
-            self.typedVariable()
+            localctx._typedVariable = self.typedVariable()
+            localctx.params.append(localctx._typedVariable)
             self.state = 162
             self._errHandler.sync(self)
             _la = self._input.LA(1)
@@ -1302,7 +1305,8 @@ class BugParser ( Parser ):
                 self.state = 158
                 self.match(BugParser.COMMA)
                 self.state = 159
-                self.typedVariable()
+                localctx._typedVariable = self.typedVariable()
+                localctx.params.append(localctx._typedVariable)
                 self.state = 164
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)

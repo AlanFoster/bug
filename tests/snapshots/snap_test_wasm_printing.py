@@ -10,7 +10,7 @@ snapshots = Snapshot()
 snapshots['test_simple_expression 1'] = '''(module
     (func $output_println (import "System::Output" "println") (param i32))
 
-    (func (export "Main")
+    (func $Main (export "Main")
         (call
             $output_println
             (i32.add
@@ -39,7 +39,7 @@ snapshots['test_function_call_with_params_and_locals 1'] = '''(module
         (get_local $answer)
     )
 
-    (func (export "Main")
+    (func $Main (export "Main")
         (local $a i32)
         (local $b i32)
         (set_local $a

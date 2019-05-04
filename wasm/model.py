@@ -61,9 +61,9 @@ class Func(Instruction):
 
     name: Optional[str] = None
     export: Optional[str] = None
-    import_: Any = None
+    import_: Optional[Any] = None
     params: List[Param] = None
-    result: Result = None
+    result: Optional[Result] = None
     locals: List[Local] = None
     instructions: List[Instruction] = None
 

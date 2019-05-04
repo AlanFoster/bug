@@ -22,6 +22,7 @@ def test_simple_expression(snapshot):
                 params=[Param("i32")],
             ),
             Func(
+                name="$Main",
                 export="Main",
                 instructions=[
                     Call(
@@ -72,6 +73,7 @@ def test_function_call_with_params_and_locals(snapshot):
                 ],
             ),
             Func(
+                name="$Main",
                 export="Main",
                 locals=[Local(type="i32", name="$a"), Local(type="i32", name="$b")],
                 instructions=[
