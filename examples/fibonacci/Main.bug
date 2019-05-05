@@ -1,0 +1,17 @@
+import System::Output;
+
+function fibonacci(n: i32): i32  {
+    if (n == 0) {
+        return 0;
+    }
+
+    if (n == 1) {
+        return 1;
+    }
+
+    return (fibonacci(n=n - 1)) + (fibonacci(n=n - 2));
+}
+
+export function Main(): void {
+    println(value=fibonacci(n=13));
+}
