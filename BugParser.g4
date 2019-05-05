@@ -29,6 +29,7 @@ statements: statement*;
 
 statement:
     forLoop
+    | ifStatement
     | letStatement
     | statementExpression
     ;
@@ -37,6 +38,11 @@ statementExpression: expression ';' ;
 
 forLoop:
     'for' variableName ',' variableName 'in' expression '{' statements '}' ;
+
+ifStatement:
+    'if' '(' condition=expression ')' '{' then_statements=statements '}'
+    ('else' '{' else_statements=statements '}') ?
+    ;
 
 letStatement: 'let' variableName '=' expression ';';
 

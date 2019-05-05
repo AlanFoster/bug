@@ -116,6 +116,15 @@ class BugParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BugParser#ifStatement.
+    def enterIfStatement(self, ctx:BugParser.IfStatementContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#ifStatement.
+    def exitIfStatement(self, ctx:BugParser.IfStatementContext):
+        pass
+
+
     # Enter a parse tree produced by BugParser#letStatement.
     def enterLetStatement(self, ctx:BugParser.LetStatementContext):
         pass

@@ -10,6 +10,7 @@ from wasm.model import (
     SetLocal,
     GetLocal,
     Result,
+    If,
 )
 from compiler import compiler
 from wasm.printer import pretty_print
@@ -194,6 +195,105 @@ def test_function_call_with_arguments():
                                     Const(type="i32", val="5"),
                                     Const(type="i32", val="15"),
                                 ],
+                            )
+                        ],
+                    )
+                ],
+            ),
+        ]
+    )
+
+
+def test_if_statement():
+    source = """
+        import System::Output;
+
+        export function Main(): void {
+            if (5 > 10) {
+                println(value=1);
+            }
+        }
+     """
+    result = compiler.generate(antlr4.InputStream(source))
+
+    assert result == Module(
+        [
+            Func(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                params=[],
+                locals=[],
+                instructions=[
+                    If(
+                        condition=BinaryOperation(
+                            op="i32.gt_s",
+                            left=Const(type="i32", val="5"),
+                            right=Const(type="i32", val="10"),
+                        ),
+                        result=None,
+                        then_statements=[
+                            Call(
+                                name="$output_println",
+                                arguments=[Const(type="i32", val="1")],
+                            )
+                        ],
+                        else_statements=None,
+                    )
+                ],
+            ),
+        ]
+    )
+
+
+def test_if_else_statement():
+    source = """
+        import System::Output;
+
+        export function Main(): void {
+            if (5 < 10) {
+                println(value=1);
+            } else {
+                println(value=0);
+            }
+        }
+     """
+    result = compiler.generate(antlr4.InputStream(source))
+
+    assert result == Module(
+        [
+            Func(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                params=[],
+                locals=[],
+                instructions=[
+                    If(
+                        condition=BinaryOperation(
+                            op="i32.lt_s",
+                            left=Const(type="i32", val="5"),
+                            right=Const(type="i32", val="10"),
+                        ),
+                        result=None,
+                        then_statements=[
+                            Call(
+                                name="$output_println",
+                                arguments=[Const(type="i32", val="1")],
+                            )
+                        ],
+                        else_statements=[
+                            Call(
+                                name="$output_println",
+                                arguments=[Const(type="i32", val="0")],
                             )
                         ],
                     )

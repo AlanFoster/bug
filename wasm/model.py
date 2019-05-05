@@ -125,21 +125,11 @@ class Call(Instruction):
 class If(Instruction):
     result: Optional[Result]
     condition: Instruction
-    then: List[Instruction]
-    else_: Optional[List[Instruction]]
+    then_statements: List[Instruction]
+    else_statements: Optional[List[Instruction]]
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_if(self)
-
-
-@dataclass
-class Condition(Instruction):
-    op: str
-    left: Instruction
-    right: Instruction
-
-    def accept(self, visitor: "WasmVisitor"):
-        return visitor.visit_condition(self)
 
 
 @dataclass
@@ -195,10 +185,6 @@ class WasmVisitor:
 
     @abstractmethod
     def visit_if(self, if_: If):
-        raise NotImplementedError()
-
-    @abstractmethod
-    def visit_condition(self, condition: Condition):
         raise NotImplementedError()
 
     @abstractmethod

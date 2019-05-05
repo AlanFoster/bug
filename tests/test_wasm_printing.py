@@ -10,7 +10,6 @@ from wasm.model import (
     GetLocal,
     SetLocal,
     If,
-    Condition,
     Drop,
 )
 from wasm.printer import pretty_print
@@ -115,28 +114,28 @@ def test_conditionals(snapshot):
                 instructions=[
                     If(
                         result=None,
-                        condition=Condition(
+                        condition=BinaryOperation(
                             op="i32.lt_s",
                             left=Const(type="i32", val="9"),
                             right=Const(type="i32", val="10"),
                         ),
-                        then=[
+                        then_statements=[
                             Call(
                                 name="$output_println",
                                 arguments=[Const(type="i32", val="1")],
                             )
                         ],
-                        else_=None,
+                        else_statements=None,
                     ),
                     If(
                         result=Result(type="i32"),
-                        condition=Condition(
+                        condition=BinaryOperation(
                             op="i32.gt_s",
                             left=Const(type="i32", val="9"),
                             right=Const(type="i32", val="10"),
                         ),
-                        then=[Const(type="i32", val="1")],
-                        else_=[Const(type="i32", val="0")],
+                        then_statements=[Const(type="i32", val="1")],
+                        else_statements=[Const(type="i32", val="0")],
                     ),
                 ],
             ),

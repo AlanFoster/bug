@@ -1,6 +1,8 @@
 lexer grammar BugLexer;
 
 // keywords
+IF: 'if' ;
+ELSE: 'else' ;
 FOR: 'for' ;
 IN: 'in' ;
 LET: 'let' ;

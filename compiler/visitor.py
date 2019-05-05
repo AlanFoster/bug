@@ -12,6 +12,7 @@ from wasm.model import (
     GetLocal,
     Local,
     Result,
+    If,
 )
 
 
@@ -20,6 +21,10 @@ def get_binary_operator(op):
         return "i32.add"
     elif op.type == BugParser.MUL:
         return "i32.mul"
+    elif op.type == BugParser.GT:
+        return "i32.gt_s"
+    elif op.type == BugParser.LT:
+        return "i32.lt_s"
     else:
         raise NotImplementedError(f"Binary operator '{op.text}' not implemented.")
 
@@ -138,6 +143,21 @@ class Visitor(BugParserVisitor):
     # Visit a parse tree produced by BugParser#forLoop.
     def visitForLoop(self, ctx: BugParser.ForLoopContext):
         raise NotImplementedError()
+
+    # Visit a parse tree produced by BugParser#ifStatement.
+    def visitIfStatement(self, ctx: BugParser.IfStatementContext):
+        condition = self.visit(ctx.condition)
+        then_statements = self.visit(ctx.then_statements)
+        else_statements = (
+            self.visit(ctx.else_statements) if ctx.else_statements else None
+        )
+        return If(
+            condition=condition,
+            # TODO: The result type will have to be inferred
+            result=None,
+            then_statements=then_statements,
+            else_statements=else_statements,
+        )
 
     # Visit a parse tree produced by BugParser#letStatement.
     def visitLetStatement(self, ctx: BugParser.LetStatementContext):

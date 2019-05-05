@@ -11,7 +11,6 @@ from .model import (
     GetLocal,
     Result,
     If,
-    Condition,
     Drop,
 )
 
@@ -142,31 +141,19 @@ class WasmPrinter(WasmVisitor):
 
         result += self.with_indentation("(then") + "\n"
         self.indentation += 1
-        for instruction in if_.then:
+        for instruction in if_.then_statements:
             result += instruction.accept(self)
         self.indentation -= 1
         result += self.with_indentation(")") + "\n"
 
-        if if_.else_:
+        if if_.else_statements:
             result += self.with_indentation("(else") + "\n"
             self.indentation += 1
-            for instruction in if_.else_:
+            for instruction in if_.else_statements:
                 result += instruction.accept(self)
             self.indentation -= 1
             result += self.with_indentation(")") + "\n"
         self.indentation -= 1
-        result += self.with_indentation(")") + "\n"
-
-        return result
-
-    def visit_condition(self, condition: Condition):
-        result = self.with_indentation(f"({condition.op}\n")
-
-        self.indentation += 1
-        result += condition.left.accept(self)
-        result += condition.right.accept(self)
-        self.indentation -= 1
-
         result += self.with_indentation(")") + "\n"
 
         return result
