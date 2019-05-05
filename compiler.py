@@ -13,7 +13,7 @@ class CompileTarget:
 
     @property
     def output(self):
-        return self.file.with_suffix(".wast")
+        return self.file.with_suffix(".wat")
 
 
 @dataclass(frozen=True)
