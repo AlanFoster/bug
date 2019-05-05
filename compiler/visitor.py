@@ -21,7 +21,7 @@ def get_binary_operator(op):
     elif op.type == BugParser.MUL:
         return "i32.mul"
     else:
-        raise NotImplementedError(f"Binary operator '{op}' not implemented.")
+        raise NotImplementedError(f"Binary operator '{op.text}' not implemented.")
 
 
 class Visitor(BugParserVisitor):

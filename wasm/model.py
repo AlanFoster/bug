@@ -121,6 +121,37 @@ class Call(Instruction):
         return visitor.visit_call(self)
 
 
+@dataclass
+class If(Instruction):
+    result: Optional[Result]
+    condition: Instruction
+    then: List[Instruction]
+    else_: Optional[List[Instruction]]
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_if(self)
+
+
+@dataclass
+class Condition(Instruction):
+    op: str
+    left: Instruction
+    right: Instruction
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_condition(self)
+
+
+@dataclass
+class Drop:
+    """
+     The drop operator throws away a single operand
+    """
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_drop(self)
+
+
 class WasmVisitor:
     @abstractmethod
     def visit_module(self, module: Module):
@@ -160,4 +191,16 @@ class WasmVisitor:
 
     @abstractmethod
     def visit_call(self, call: Call):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_if(self, if_: If):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_condition(self, condition: Condition):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_drop(self, drop: Drop):
         raise NotImplementedError()

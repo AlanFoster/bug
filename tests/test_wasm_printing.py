@@ -9,6 +9,9 @@ from wasm.model import (
     Local,
     GetLocal,
     SetLocal,
+    If,
+    Condition,
+    Drop,
 )
 from wasm.printer import pretty_print
 
@@ -89,6 +92,59 @@ def test_function_call_with_params_and_locals(snapshot):
                         ],
                     ),
                 ],
+            ),
+        ]
+    )
+    wasm_result = pretty_print(source)
+    snapshot.assert_match(wasm_result)
+
+
+def test_conditionals(snapshot):
+    source = Module(
+        [
+            Func(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            ),
+            Func(
+                name="$Foo",
+                result=Result(type="i32"),
+                export=None,
+                locals=[],
+                instructions=[
+                    If(
+                        result=None,
+                        condition=Condition(
+                            op="i32.lt_s",
+                            left=Const(type="i32", val="9"),
+                            right=Const(type="i32", val="10"),
+                        ),
+                        then=[
+                            Call(
+                                name="$output_println",
+                                arguments=[Const(type="i32", val="1")],
+                            )
+                        ],
+                        else_=None,
+                    ),
+                    If(
+                        result=Result(type="i32"),
+                        condition=Condition(
+                            op="i32.gt_s",
+                            left=Const(type="i32", val="9"),
+                            right=Const(type="i32", val="10"),
+                        ),
+                        then=[Const(type="i32", val="1")],
+                        else_=[Const(type="i32", val="0")],
+                    ),
+                ],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                locals=[],
+                instructions=[Call(name="$Foo", arguments=[]), Drop()],
             ),
         ]
     )

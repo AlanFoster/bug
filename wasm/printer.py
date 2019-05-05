@@ -10,6 +10,9 @@ from .model import (
     SetLocal,
     GetLocal,
     Result,
+    If,
+    Condition,
+    Drop,
 )
 
 
@@ -126,6 +129,50 @@ class WasmPrinter(WasmVisitor):
         result += self.with_indentation(")") + "\n"
 
         return result
+
+    def visit_if(self, if_: If):
+        result = self.with_indentation("(if\n")
+
+        self.indentation += 1
+        if if_.result:
+            result += self.with_indentation(if_.result.accept(self)) + "\n"
+
+        if if_.condition:
+            result += if_.condition.accept(self)
+
+        result += self.with_indentation("(then") + "\n"
+        self.indentation += 1
+        for instruction in if_.then:
+            result += instruction.accept(self)
+        self.indentation -= 1
+        result += self.with_indentation(")") + "\n"
+
+        if if_.else_:
+            result += self.with_indentation("(else") + "\n"
+            self.indentation += 1
+            for instruction in if_.else_:
+                result += instruction.accept(self)
+            self.indentation -= 1
+            result += self.with_indentation(")") + "\n"
+        self.indentation -= 1
+        result += self.with_indentation(")") + "\n"
+
+        return result
+
+    def visit_condition(self, condition: Condition):
+        result = self.with_indentation(f"({condition.op}\n")
+
+        self.indentation += 1
+        result += condition.left.accept(self)
+        result += condition.right.accept(self)
+        self.indentation -= 1
+
+        result += self.with_indentation(")") + "\n"
+
+        return result
+
+    def visit_drop(self, _drop: Drop):
+        return self.with_indentation("(drop)") + "\n"
 
     def with_indentation(self, str):
         return ("    " * self.indentation) + str
