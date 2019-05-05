@@ -32,7 +32,10 @@ statement:
     | ifStatement
     | letStatement
     | statementExpression
+    | returnStatement
     ;
+
+returnStatement: 'return' expression ? ';' ;
 
 statementExpression: expression ';' ;
 
@@ -62,7 +65,7 @@ expression:
     | left=expression operator=(LT | GT) right=expression   # binaryExpression
     | left=expression operator=AND right=expression         # binaryExpression
     | left=expression operator=OR right=expression          # binaryExpression
-    | left=expression operator=EQ right=expression          # binaryExpression
+    | left=expression operator=EQEQ right=expression        # binaryExpression
     | variableName                                          # variableNameExpression
     | literal                                               # literalExpression
     | expression '(' argumentList? ')'                      # callExpression

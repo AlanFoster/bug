@@ -13,6 +13,8 @@ from wasm.model import (
     Local,
     Result,
     If,
+    Nop,
+    Return,
 )
 
 
@@ -25,6 +27,10 @@ def get_binary_operator(op):
         return "i32.gt_s"
     elif op.type == BugParser.LT:
         return "i32.lt_s"
+    elif op.type == BugParser.EQEQ:
+        return "i32.eq"
+    elif op.type == BugParser.SUB:
+        return "i32.sub"
     else:
         raise NotImplementedError(f"Binary operator '{op.text}' not implemented.")
 
@@ -136,6 +142,12 @@ class Visitor(BugParserVisitor):
     def visitStatement(self, ctx: BugParser.StatementContext):
         return self.visitChildren(ctx)
 
+    # Visit a parse tree produced by BugParser#returnStatement.
+    def visitReturnStatement(self, ctx: BugParser.ReturnStatementContext):
+        return Return(
+            expression=self.visit(ctx.expression()) if ctx.expression() else Nop()
+        )
+
     # Visit a parse tree produced by BugParser#statementExpression.
     def visitStatementExpression(self, ctx: BugParser.StatementExpressionContext):
         return self.visit(ctx.expression())
@@ -153,8 +165,8 @@ class Visitor(BugParserVisitor):
         )
         return If(
             condition=condition,
-            # TODO: The result type will have to be inferred
-            result=None,
+            # TODO: The result type will have to be inferred correctly
+            result=Result(type="i32"),
             then_statements=then_statements,
             else_statements=else_statements,
         )
@@ -224,7 +236,7 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#nestedExpression.
     def visitNestedExpression(self, ctx: BugParser.NestedExpressionContext):
-        raise NotImplementedError()
+        return self.visit(ctx.expression())
 
     # Visit a parse tree produced by BugParser#unaryExpression.
     def visitUnaryExpression(self, ctx: BugParser.UnaryExpressionContext):

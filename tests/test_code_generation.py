@@ -11,6 +11,8 @@ from wasm.model import (
     GetLocal,
     Result,
     If,
+    Return,
+    Nop,
 )
 from compiler import compiler
 from wasm.printer import pretty_print
@@ -212,6 +214,7 @@ def test_if_statement():
             if (5 > 10) {
                 println(value=1);
             }
+            return;
         }
      """
     result = compiler.generate(antlr4.InputStream(source))
@@ -235,7 +238,8 @@ def test_if_statement():
                             left=Const(type="i32", val="5"),
                             right=Const(type="i32", val="10"),
                         ),
-                        result=None,
+                        # TODO: This type should be None once expression types are correctly identified
+                        result=Result(type="i32"),
                         then_statements=[
                             Call(
                                 name="$output_println",
@@ -243,7 +247,8 @@ def test_if_statement():
                             )
                         ],
                         else_statements=None,
-                    )
+                    ),
+                    Return(Nop()),
                 ],
             ),
         ]
@@ -260,6 +265,7 @@ def test_if_else_statement():
             } else {
                 println(value=0);
             }
+            return;
         }
      """
     result = compiler.generate(antlr4.InputStream(source))
@@ -283,7 +289,8 @@ def test_if_else_statement():
                             left=Const(type="i32", val="5"),
                             right=Const(type="i32", val="10"),
                         ),
-                        result=None,
+                        # TODO: This type should be None once expression types are correctly identified
+                        result=Result(type="i32"),
                         then_statements=[
                             Call(
                                 name="$output_println",
@@ -296,7 +303,99 @@ def test_if_else_statement():
                                 arguments=[Const(type="i32", val="0")],
                             )
                         ],
+                    ),
+                    Return(expression=Nop()),
+                ],
+            ),
+        ]
+    )
+
+
+def test_factorial():
+    # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
+    source = """
+        import System::Output;
+
+        function factorial(n: i32): i32 {
+            if (n == 1) {
+                return 1;
+            } else {
+                return n * (factorial(n=n-1));
+            }
+        }
+
+        export function Main(): void {
+            println(value=factorial(n=5));
+            return;
+        }
+     """
+    result = compiler.generate(antlr4.InputStream(source))
+
+    assert result == Module(
+        [
+            Func(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            ),
+            Func(
+                name="$factorial",
+                export=None,
+                params=[Param(type="i32", name="$n")],
+                locals=[],
+                result=Result(type="i32"),
+                instructions=[
+                    If(
+                        condition=BinaryOperation(
+                            op="i32.eq",
+                            left=GetLocal(name="$n"),
+                            right=Const(type="i32", val="1"),
+                        ),
+                        result=Result("i32"),
+                        then_statements=[Return(expression=Const(type="i32", val="1"))],
+                        else_statements=[
+                            Return(
+                                expression=(
+                                    BinaryOperation(
+                                        op="i32.mul",
+                                        left=GetLocal(name="$n"),
+                                        right=(
+                                            Call(
+                                                name="$factorial",
+                                                arguments=[
+                                                    BinaryOperation(
+                                                        op="i32.sub",
+                                                        left=GetLocal(name="$n"),
+                                                        right=Const(
+                                                            type="i32", val="1"
+                                                        ),
+                                                    )
+                                                ],
+                                            )
+                                        ),
+                                    )
+                                )
+                            )
+                        ],
                     )
+                ],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                params=[],
+                locals=[],
+                instructions=[
+                    Call(
+                        name="$output_println",
+                        arguments=[
+                            Call(
+                                name="$factorial",
+                                arguments=[Const(type="i32", val="5")],
+                            )
+                        ],
+                    ),
+                    Return(expression=Nop()),
                 ],
             ),
         ]

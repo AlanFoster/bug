@@ -10,6 +10,7 @@ DATA: 'data' ;
 EXPORT: 'export' ;
 IMPORT: 'import' ;
 FUNCTION: 'function' ;
+RETURN: 'return' ;
 
 VOID: 'void' ;
 I32: 'i32';
@@ -39,6 +40,7 @@ AND: '&' ;
 OR: '|' ;
 LT: '<' ;
 GT: '>' ;
+EQEQ: '==' ;
 EQ: '=' ;
 NOT: '~' ;
 

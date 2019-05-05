@@ -99,3 +99,29 @@ snapshots['test_conditionals 1'] = '''(module
     )
 )
 '''
+
+snapshots['test_returns 1'] = '''(module
+    (func $output_println (import "System::Output" "println") (param i32))
+
+    (func $meaning_of_life (result i32)
+        (return
+            (i32.const 42)
+        )
+    )
+
+    (func $output_meaning_of_life
+        (call
+            $meaning_of_life
+        )
+        (return
+            (nop)
+        )
+    )
+
+    (func $Main (export "Main")
+        (call
+            $output_meaning_of_life
+        )
+    )
+)
+'''

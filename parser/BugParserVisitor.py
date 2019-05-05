@@ -59,6 +59,11 @@ class BugParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by BugParser#returnStatement.
+    def visitReturnStatement(self, ctx:BugParser.ReturnStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by BugParser#statementExpression.
     def visitStatementExpression(self, ctx:BugParser.StatementExpressionContext):
         return self.visitChildren(ctx)

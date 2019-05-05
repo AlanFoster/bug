@@ -133,6 +133,20 @@ class If(Instruction):
 
 
 @dataclass
+class Return(Instruction):
+    expression: Optional[Instruction]
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_return(self)
+
+
+@dataclass
+class Nop(Instruction):
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_nop(self)
+
+
+@dataclass
 class Drop:
     """
      The drop operator throws away a single operand
@@ -189,4 +203,12 @@ class WasmVisitor:
 
     @abstractmethod
     def visit_drop(self, drop: Drop):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_return(self, return_: Return):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_nop(self, return_: Return):
         raise NotImplementedError()

@@ -11,6 +11,8 @@ from wasm.model import (
     SetLocal,
     If,
     Drop,
+    Return,
+    Nop,
 )
 from wasm.printer import pretty_print
 
@@ -144,6 +146,43 @@ def test_conditionals(snapshot):
                 export="Main",
                 locals=[],
                 instructions=[Call(name="$Foo", arguments=[]), Drop()],
+            ),
+        ]
+    )
+    wasm_result = pretty_print(source)
+    snapshot.assert_match(wasm_result)
+
+
+def test_returns(snapshot):
+    source = Module(
+        [
+            Func(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            ),
+            Func(
+                name="$meaning_of_life",
+                result=Result(type="i32"),
+                export=None,
+                locals=[],
+                instructions=[Return(expression=Const(type="i32", val="42"))],
+            ),
+            Func(
+                name="$output_meaning_of_life",
+                result=None,
+                export=None,
+                locals=[],
+                instructions=[
+                    Call(name="$meaning_of_life", arguments=[]),
+                    Return(expression=Nop()),
+                ],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                locals=[],
+                instructions=[Call(name="$output_meaning_of_life", arguments=[])],
             ),
         ]
     )

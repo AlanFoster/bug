@@ -98,6 +98,15 @@ class BugParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BugParser#returnStatement.
+    def enterReturnStatement(self, ctx:BugParser.ReturnStatementContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#returnStatement.
+    def exitReturnStatement(self, ctx:BugParser.ReturnStatementContext):
+        pass
+
+
     # Enter a parse tree produced by BugParser#statementExpression.
     def enterStatementExpression(self, ctx:BugParser.StatementExpressionContext):
         pass

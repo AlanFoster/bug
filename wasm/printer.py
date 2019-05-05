@@ -11,7 +11,9 @@ from .model import (
     GetLocal,
     Result,
     If,
+    Return,
     Drop,
+    Nop,
 )
 
 
@@ -160,6 +162,23 @@ class WasmPrinter(WasmVisitor):
 
     def visit_drop(self, _drop: Drop):
         return self.with_indentation("(drop)") + "\n"
+
+    def visit_return(self, return_: Return):
+        result = self.with_indentation("(return")
+
+        if return_.expression:
+            result += "\n"
+            self.indentation += 1
+            result += return_.expression.accept(self)
+            self.indentation -= 1
+            result += self.with_indentation(")") + "\n"
+        else:
+            result += ")\n"
+
+        return result
+
+    def visit_nop(self, nop: Nop):
+        return self.with_indentation("(nop)") + "\n"
 
     def with_indentation(self, str):
         return ("    " * self.indentation) + str
