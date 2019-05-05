@@ -214,7 +214,6 @@ def test_if_statement():
             if (5 > 10) {
                 println(value=1);
             }
-            return;
         }
      """
     result = compiler.generate(antlr4.InputStream(source))
@@ -238,8 +237,7 @@ def test_if_statement():
                             left=Const(type="i32", val="5"),
                             right=Const(type="i32", val="10"),
                         ),
-                        # TODO: This type should be None once expression types are correctly identified
-                        result=Result(type="i32"),
+                        result=None,
                         then_statements=[
                             Call(
                                 name="$output_println",
@@ -247,8 +245,7 @@ def test_if_statement():
                             )
                         ],
                         else_statements=None,
-                    ),
-                    Return(Nop()),
+                    )
                 ],
             ),
         ]
@@ -265,7 +262,6 @@ def test_if_else_statement():
             } else {
                 println(value=0);
             }
-            return;
         }
      """
     result = compiler.generate(antlr4.InputStream(source))
@@ -289,8 +285,7 @@ def test_if_else_statement():
                             left=Const(type="i32", val="5"),
                             right=Const(type="i32", val="10"),
                         ),
-                        # TODO: This type should be None once expression types are correctly identified
-                        result=Result(type="i32"),
+                        result=None,
                         then_statements=[
                             Call(
                                 name="$output_println",
@@ -303,8 +298,7 @@ def test_if_else_statement():
                                 arguments=[Const(type="i32", val="0")],
                             )
                         ],
-                    ),
-                    Return(expression=Nop()),
+                    )
                 ],
             ),
         ]
@@ -326,7 +320,6 @@ def test_factorial():
 
         export function Main(): void {
             println(value=factorial(n=5));
-            return;
         }
      """
     result = compiler.generate(antlr4.InputStream(source))
@@ -351,7 +344,7 @@ def test_factorial():
                             left=GetLocal(name="$n"),
                             right=Const(type="i32", val="1"),
                         ),
-                        result=Result("i32"),
+                        result=None,
                         then_statements=[Return(expression=Const(type="i32", val="1"))],
                         else_statements=[
                             Return(
@@ -394,8 +387,7 @@ def test_factorial():
                                 arguments=[Const(type="i32", val="5")],
                             )
                         ],
-                    ),
-                    Return(expression=Nop()),
+                    )
                 ],
             ),
         ]

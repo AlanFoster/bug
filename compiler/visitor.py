@@ -166,7 +166,7 @@ class Visitor(BugParserVisitor):
         return If(
             condition=condition,
             # TODO: The result type will have to be inferred correctly
-            result=Result(type="i32"),
+            result=None,
             then_statements=then_statements,
             else_statements=else_statements,
         )
