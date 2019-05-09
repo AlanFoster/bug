@@ -4,6 +4,22 @@ Work in progress language that is most likely filled with bugs.
 
 ## Notes
 
+## wabt
+
+[wabt](https://github.com/WebAssembly/wabt) contains a collection of useful tools, such as compilers to and from wat/wasm.
+
+Compiling wasm to wat:
+
+```
+$ wat2wasm simple.wat -o simple.wasm
+```
+
+Viewing wasm's contents:
+
+```
+$ wat2wasm simple.wat -v
+```
+
 ## Resources
 
 - [Understanding the wasm text format](https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format)
