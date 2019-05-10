@@ -1,59 +1,51 @@
-from compiler.symbol_table import EmptySymbolTable, Symbol, SymbolType
 from parser.BugParser import BugParser
 from parser.BugParserVisitor import BugParserVisitor
-from wasm.model import (
-    Module,
-    Func,
-    BinaryOperation,
-    Call,
-    Param,
-    Const,
-    SetLocal,
-    GetLocal,
-    Local,
-    Result,
+from .ast import (
+    Program,
     If,
-    Nop,
+    Function,
+    BinaryOperator,
+    BinaryOperation,
+    FunctionCall,
+    Argument,
+    Param,
+    Import,
+    Number,
+    Variable,
+    Let,
     Return,
 )
 
 
 def get_binary_operator(op):
     if op.type == BugParser.ADD:
-        return "i32.add"
+        return BinaryOperator.ADD
     elif op.type == BugParser.MUL:
-        return "i32.mul"
+        return BinaryOperator.MULTIPLY
     elif op.type == BugParser.GT:
-        return "i32.gt_s"
+        return BinaryOperator.GREATER_THAN
     elif op.type == BugParser.LT:
-        return "i32.lt_s"
+        return BinaryOperator.LESS_THAN
     elif op.type == BugParser.EQEQ:
-        return "i32.eq"
+        return BinaryOperator.EQUALS
     elif op.type == BugParser.SUB:
-        return "i32.sub"
+        return BinaryOperator.SUBTRACT
     else:
         raise NotImplementedError(f"Binary operator '{op.text}' not implemented.")
 
 
-class Visitor(BugParserVisitor):
+class ParseTreeVisitor(BugParserVisitor):
     def __init__(self):
-        self.symbol_table: EmptySymbolTable = EmptySymbolTable()
+        pass
 
     # Visit a parse tree produced by BugParser#program.
     def visitProgram(self, ctx: BugParser.ProgramContext):
-        self.symbol_table = self.symbol_table.enter_scope()
-
         imports = self.visit(ctx.importStatements())
-
         functions = []
         for function in ctx.functionDef():
             functions.append(self.visit(function))
 
-        instructions = []
-        instructions += imports
-        instructions += functions
-        self.symbol_table = self.symbol_table.exit_scope()
-        return Module(instructions=instructions)
+        return Program(imports=imports, functions=functions)
 
     # Visit a parse tree produced by BugParser#importStatements.
     def visitImportStatements(self, ctx: BugParser.ImportStatementsContext):
@@ -69,51 +61,28 @@ class Visitor(BugParserVisitor):
                 f"Import statement '${ctx.getText()}' not yet supported."
             )
 
-        return Func(
-            name="$output_println",
-            import_=("System::Output", "println"),
-            params=[Param("i32")],
-        )
+        return Import(value="System::Output")
 
     # Visit a parse tree produced by BugParser#functionDef.
     def visitFunctionDef(self, ctx: BugParser.FunctionDefContext):
-        # Place the current function into the symbol table so that it can be called by
-        # other functions later, or recursively if required.
         function_name = ctx.functionName().getText()
         return_type = ctx.returnTypeName().getText()
-        function_symbol = Symbol(
-            name=function_name, type=return_type, kind=SymbolType.FUNC
-        )
-        self.symbol_table.add(function_symbol)
 
-        self.symbol_table = self.symbol_table.enter_scope()
-
-        # Populate the required params into the symbol table before compiling the function body
         params = []
         if ctx.parameterList():
             for param in ctx.parameterList().params:
                 var_name = param.variableName().getText()
                 type_ = param.typeName().getText()
-                symbol = Symbol(name=var_name, type=type_, kind=SymbolType.PARAM)
-                self.symbol_table.add(symbol)
-                params.append(Param(type=symbol.type, name=symbol.generated_name))
+                params.append(Param(type=type_, name=var_name))
         body = self.visit(ctx.functionBody())
 
-        # Note, locals will be populated after visiting the function body
-        locals_ = []
-        for symbol in self.symbol_table.locals():
-            locals_.append(Local(type=symbol.type, name=symbol.generated_name))
-        self.symbol_table = self.symbol_table.exit_scope()
-
-        return Func(
+        return Function(
             # Note: The function name is the internally generated name for this module
-            name=function_symbol.generated_name,
-            # Note: The export name is the original function name
-            export=function_name if ctx.EXPORT() else None,
+            name=function_name,
+            is_exported=ctx.EXPORT() is not None,
             params=params,
-            result=None if return_type == "void" else Result(type=return_type),
-            locals=locals_,
-            instructions=body,
+            result=None if return_type == "void" else return_type,
+            body=body,
         )
 
     # Visit a parse tree produced by BugParser#data.
@@ -144,9 +113,7 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#returnStatement.
     def visitReturnStatement(self, ctx: BugParser.ReturnStatementContext):
-        return Return(
-            expression=self.visit(ctx.expression()) if ctx.expression() else Nop()
-        )
+        return Return(value=self.visit(ctx.expression()) if ctx.expression() else None)
 
     # Visit a parse tree produced by BugParser#statementExpression.
     def visitStatementExpression(self, ctx: BugParser.StatementExpressionContext):
@@ -163,24 +130,18 @@ class Visitor(BugParserVisitor):
         else_statements = (
             self.visit(ctx.else_statements) if ctx.else_statements else None
         )
+
         return If(
             condition=condition,
-            # TODO: The result type will have to be inferred correctly
-            result=None,
             then_statements=then_statements,
             else_statements=else_statements,
         )
 
     # Visit a parse tree produced by BugParser#letStatement.
     def visitLetStatement(self, ctx: BugParser.LetStatementContext):
+        name = ctx.variableName().getText()
         expression = self.visit(ctx.expression())
-        varable_name = ctx.variableName().getText()
-        # TODO: Assignments should infer the expression type / support explicit types: `let a: i32 = expression;`
-        type_ = "i32"
-        symbol = Symbol(name=varable_name, type=type_, kind=SymbolType.LOCAL)
-        self.symbol_table.add(symbol)
-
-        return SetLocal(name=symbol.generated_name, val=expression)
+        return Let(name=name, value=expression)
 
     # Visit a parse tree produced by BugParser#returnTypeName.
     def visitReturnTypeName(self, ctx: BugParser.ReturnTypeNameContext):
@@ -204,35 +165,22 @@ class Visitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#binaryExpression.
     def visitBinaryExpression(self, ctx: BugParser.BinaryExpressionContext):
-        operation = get_binary_operator(ctx.operator)
+        operator = get_binary_operator(ctx.operator)
         left = self.visit(ctx.left)
         right = self.visit(ctx.right)
 
-        return BinaryOperation(op=operation, left=left, right=right)
+        return BinaryOperation(operator=operator, left=left, right=right)
 
     # Visit a parse tree produced by BugParser#callExpression.
     def visitCallExpression(self, ctx: BugParser.CallExpressionContext):
-        function_name = ctx.expression().getText()
-        # Note: This will need to use a real symbol table in the future
-        if function_name == "println":
-            function_name = "$output_println"
-        elif self.symbol_table.has(function_name):
-            symbol = self.symbol_table.get(function_name)
-            if symbol.kind is not SymbolType.FUNC:
-                raise NotImplementedError(f"{function_name} is not a function")
-
-            function_name = symbol.generated_name
-        else:
-            raise NotImplementedError(f"{function_name} not supported")
+        name = ctx.expression().getText()
         arguments = self.visit(ctx.argumentList()) if ctx.argumentList() else []
-        return Call(name=function_name, arguments=arguments)
+        return FunctionCall(name=name, arguments=arguments)
 
     # Visit a parse tree produced by BugParser#variableNameExpression.
     def visitVariableNameExpression(self, ctx: BugParser.VariableNameExpressionContext):
-        variable_name = ctx.variableName().getText()
-        symbol = self.symbol_table.get(variable_name)
-
-        return GetLocal(name=symbol.generated_name)
+        name = ctx.variableName().getText()
+        return Variable(name=name)
 
     # Visit a parse tree produced by BugParser#nestedExpression.
     def visitNestedExpression(self, ctx: BugParser.NestedExpressionContext):
@@ -249,7 +197,7 @@ class Visitor(BugParserVisitor):
     # Visit a parse tree produced by BugParser#literal.
     def visitLiteral(self, ctx: BugParser.LiteralContext):
         if ctx.INTEGER():
-            return Const(type="i32", val=ctx.INTEGER().getText())
+            return Number(value=int(ctx.INTEGER().getText()))
         else:
             raise NotImplementedError(f"literal {ctx.getText()} not implemented")
 
@@ -269,10 +217,10 @@ class Visitor(BugParserVisitor):
     # Visit a parse tree produced by BugParser#argument.
     def visitArgument(self, ctx: BugParser.ArgumentContext):
         # Note: In the future, these variable names will map to the correct argument order
-        _variable_name = ctx.variableName().getText()
+        variable_name = ctx.variableName().getText()
         expression = self.visit(ctx.expression())
 
-        return expression
+        return Argument(name=variable_name, value=expression)
 
     # Visit a parse tree produced by BugParser#typeName.
     def visitTypeName(self, ctx: BugParser.TypeNameContext):

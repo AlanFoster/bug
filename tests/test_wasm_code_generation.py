@@ -12,10 +12,22 @@ from wasm.model import (
     Result,
     If,
     Return,
-    Nop,
 )
 from compiler import compiler
-from wasm.printer import pretty_print
+
+
+def get_wasm(source: str) -> Module:
+    input_stream = antlr4.InputStream(source)
+    parse_tree = compiler.get_parse_tree(input_stream)
+    ast = compiler.get_ast(parse_tree)
+    return compiler.get_wasm(ast)
+
+
+def test_empty_program():
+    source = ""
+    result = get_wasm(source)
+
+    assert result == Module([])
 
 
 def test_simple_expression():
@@ -26,7 +38,7 @@ def test_simple_expression():
             println(value=1 + 2 * 3);
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
         [

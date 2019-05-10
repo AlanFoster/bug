@@ -4,7 +4,6 @@ from enum import Enum
 from typing import Dict, Optional
 
 
-@dataclass
 class SymbolType(Enum):
     LOCAL = 1
     PARAM = 2

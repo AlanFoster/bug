@@ -73,6 +73,7 @@ class Func(Instruction):
 
 @dataclass
 class BinaryOperation(Instruction):
+    # TODO: Rename this to operator
     op: str
     left: Instruction
     right: Instruction
