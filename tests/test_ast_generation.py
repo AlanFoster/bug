@@ -13,6 +13,8 @@ from compiler.ast import (
     Variable,
     Param,
     Return,
+    DataDef,
+    MemberAccess,
 )
 from compiler import compiler
 
@@ -27,7 +29,7 @@ def test_empty_program():
     source = ""
     result = get_ast(source)
 
-    assert result == Program(imports=[], functions=[])
+    assert result == Program(imports=[], data_defs=[], functions=[])
 
 
 def test_simple_expression():
@@ -42,6 +44,7 @@ def test_simple_expression():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="Main",
@@ -86,6 +89,7 @@ def test_simple_assignment():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="Main",
@@ -130,6 +134,7 @@ def test_function_call_with_no_arguments():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="sayNumber",
@@ -170,6 +175,7 @@ def test_function_call_with_arguments():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="add",
@@ -227,6 +233,7 @@ def test_if_statement():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="Main",
@@ -271,6 +278,7 @@ def test_if_else_statement():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="Main",
@@ -324,6 +332,7 @@ def test_factorial():
 
     assert result == Program(
         imports=[Import(value="System::Output")],
+        data_defs=[],
         functions=[
             Function(
                 name="factorial",
@@ -382,5 +391,147 @@ def test_factorial():
                     )
                 ],
             ),
+        ],
+    )
+
+
+def test_data_vector():
+    source = """
+        import System::Output;
+
+        export data Vector(x: i32, y: i32);
+
+        export function Main(): void {
+
+        }
+     """
+    result = get_ast(source)
+
+    assert result == Program(
+        imports=[Import(value="System::Output")],
+        data_defs=[
+            DataDef(
+                name="Vector",
+                is_exported=True,
+                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
+                functions=[],
+            )
+        ],
+        functions=[
+            Function(name="Main", is_exported=True, params=[], result=None, body=[])
+        ],
+    )
+
+
+def test_data_vector_with_simple_function():
+    source = """
+        import System::Output;
+
+        export data Vector(x: i32, y: i32) {
+            function length(): i32 {
+                42;
+            }
+        }
+
+        export function Main(): void {
+
+        }
+     """
+    result = get_ast(source)
+
+    assert result == Program(
+        imports=[Import(value="System::Output")],
+        data_defs=[
+            DataDef(
+                name="Vector",
+                is_exported=True,
+                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
+                functions=[
+                    Function(
+                        name="length",
+                        is_exported=False,
+                        params=[],
+                        result="i32",
+                        body=[Number(value=42)],
+                    )
+                ],
+            )
+        ],
+        functions=[
+            Function(name="Main", is_exported=True, params=[], result=None, body=[])
+        ],
+    )
+
+
+def test_data_vector_with_complex_function():
+    # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
+    source = """
+        import System::Output;
+
+        export data Vector(x: i32, y: i32) {
+            function add(self: Vector, other: Vector): Vector {
+                Vector(x = (self.x) + (other.x), y = (self.y) + (other.y));
+            }
+        }
+
+        export function Main(): void {
+
+        }
+     """
+    result = get_ast(source)
+
+    assert result == Program(
+        imports=[Import(value="System::Output")],
+        data_defs=[
+            DataDef(
+                name="Vector",
+                is_exported=True,
+                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
+                functions=[
+                    Function(
+                        name="add",
+                        is_exported=False,
+                        params=[
+                            Param(name="self", type="Vector"),
+                            Param(name="other", type="Vector"),
+                        ],
+                        result="Vector",
+                        body=[
+                            FunctionCall(
+                                name="Vector",
+                                arguments=[
+                                    Argument(
+                                        name="x",
+                                        value=BinaryOperation(
+                                            operator=BinaryOperator.ADD,
+                                            left=MemberAccess(
+                                                value=Variable("self"), member="x"
+                                            ),
+                                            right=MemberAccess(
+                                                value=Variable("other"), member="x"
+                                            ),
+                                        ),
+                                    ),
+                                    Argument(
+                                        name="y",
+                                        value=BinaryOperation(
+                                            operator=BinaryOperator.ADD,
+                                            left=MemberAccess(
+                                                value=Variable("self"), member="y"
+                                            ),
+                                            right=MemberAccess(
+                                                value=Variable("other"), member="y"
+                                            ),
+                                        ),
+                                    ),
+                                ],
+                            )
+                        ],
+                    )
+                ],
+            )
+        ],
+        functions=[
+            Function(name="Main", is_exported=True, params=[], result=None, body=[])
         ],
     )

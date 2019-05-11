@@ -86,6 +86,26 @@ class Function(Node):
 
 
 @dataclass
+class DataDef(Node):
+    name: str
+    is_exported: bool
+    params: List[Param]
+    functions: List[Function]
+
+    def accept(self, visitor: "AstVisitor"):
+        return visitor.visit_data(self)
+
+
+@dataclass
+class MemberAccess(Node):
+    value: Node
+    member: str
+
+    def accept(self, visitor: "AstVisitor"):
+        return visitor.visit_member_access(self)
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     arguments: List[Argument]
@@ -111,6 +131,7 @@ class Let(Node):
         return visitor.visit_let(self)
 
 
+# TODO: Perhaps rename to "Name"
 @dataclass
 class Variable(Node):
     name: str
@@ -123,6 +144,7 @@ class Variable(Node):
 class Program:
     imports: List[Import]
     functions: List[Function]
+    data_defs: List[DataDef]
 
     def accept(self, visitor: "AstVisitor"):
         return visitor.visit_program(self)
@@ -163,4 +185,10 @@ class AstVisitor:
         raise NotImplementedError()
 
     def visit_if(self, if_: If):
+        raise NotImplementedError()
+
+    def visit_data(self, data: DataDef):
+        raise NotImplementedError()
+
+    def visit_member_access(self, member: MemberAccess):
         raise NotImplementedError()

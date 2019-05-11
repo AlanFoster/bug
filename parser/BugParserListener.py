@@ -242,6 +242,15 @@ class BugParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BugParser#memberDotExpression.
+    def enterMemberDotExpression(self, ctx:BugParser.MemberDotExpressionContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#memberDotExpression.
+    def exitMemberDotExpression(self, ctx:BugParser.MemberDotExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by BugParser#literal.
     def enterLiteral(self, ctx:BugParser.LiteralContext):
         pass

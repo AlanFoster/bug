@@ -21,7 +21,7 @@ data:
 
 dataName: IDENTIFIER ;
 
-dataList: typedVariable (',' typedVariable)* ;
+dataList: params+=typedVariable (',' params+=typedVariable)* ;
 
 functionBody: statements ;
 
@@ -66,12 +66,12 @@ expression:
     | left=expression operator=AND right=expression         # binaryExpression
     | left=expression operator=OR right=expression          # binaryExpression
     | left=expression operator=EQEQ right=expression        # binaryExpression
+    | expression '.' variableName                           # memberDotExpression
     | variableName                                          # variableNameExpression
     | literal                                               # literalExpression
     | expression '(' argumentList? ')'                      # callExpression
     | '(' expression ')'                                    # nestedExpression
     ;
-//    | expression '.' variableName                           #
 
 literal:
     INTEGER

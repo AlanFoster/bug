@@ -14,6 +14,8 @@ from .ast import (
     Variable,
     Let,
     Return,
+    DataDef,
+    MemberAccess,
 )
 
 
@@ -44,8 +46,11 @@ class ParseTreeVisitor(BugParserVisitor):
         functions = []
         for function in ctx.functionDef():
             functions.append(self.visit(function))
+        data_defs = []
+        for data in ctx.data():
+            data_defs.append(self.visit(data))
 
-        return Program(imports=imports, functions=functions)
+        return Program(imports=imports, functions=functions, data_defs=data_defs)
 
     # Visit a parse tree produced by BugParser#importStatements.
     def visitImportStatements(self, ctx: BugParser.ImportStatementsContext):
@@ -87,7 +92,23 @@ class ParseTreeVisitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#data.
     def visitData(self, ctx: BugParser.DataContext):
-        raise NotImplementedError()
+        params = []
+        if ctx.dataList():
+            for param in ctx.dataList().params:
+                var_name = param.variableName().getText()
+                type_ = param.typeName().getText()
+                params.append(Param(type=type_, name=var_name))
+        functions = []
+        if ctx.functionDef():
+            for function in ctx.functionDef():
+                functions.append(self.visit(function))
+
+        return DataDef(
+            name=ctx.dataName().getText(),
+            is_exported=ctx.EXPORT() is not None,
+            params=params,
+            functions=functions,
+        )
 
     # Visit a parse tree produced by BugParser#dataName.
     def visitDataName(self, ctx: BugParser.DataNameContext):
@@ -189,6 +210,13 @@ class ParseTreeVisitor(BugParserVisitor):
     # Visit a parse tree produced by BugParser#unaryExpression.
     def visitUnaryExpression(self, ctx: BugParser.UnaryExpressionContext):
         raise NotImplementedError()
+
+    # Visit a parse tree produced by BugParser#memberDotExpression.
+    def visitMemberDotExpression(self, ctx: BugParser.MemberDotExpressionContext):
+        value = self.visit(ctx.expression())
+        member = ctx.variableName().getText()
+
+        return MemberAccess(value=value, member=member)
 
     # Visit a parse tree produced by BugParser#literalExpression.
     def visitLiteralExpression(self, ctx: BugParser.LiteralExpressionContext):

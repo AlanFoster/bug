@@ -139,6 +139,11 @@ class BugParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by BugParser#memberDotExpression.
+    def visitMemberDotExpression(self, ctx:BugParser.MemberDotExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by BugParser#literal.
     def visitLiteral(self, ctx:BugParser.LiteralContext):
         return self.visitChildren(ctx)
