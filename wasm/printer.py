@@ -19,6 +19,7 @@ from .model import (
     GetGlobal,
     Global,
     Import,
+    Store,
 )
 
 
@@ -44,6 +45,11 @@ class WasmPrinter(WasmVisitor):
 
         if import_.name:
             result += " " + import_.name
+
+        if import_.import_:
+            imports = " ".join([f'"{name}"' for name in import_.import_])
+
+            result += f" (import {imports})"
 
         if import_.params:
             params = [param.accept(self) for param in import_.params]
@@ -72,11 +78,6 @@ class WasmPrinter(WasmVisitor):
 
         if func.name:
             result += " " + func.name
-
-        if func.import_:
-            imports = " ".join([f'"{name}"' for name in func.import_])
-
-            result += f" (import {imports})"
 
         if func.export:
             result += f' (export "{func.export}")'
@@ -234,6 +235,16 @@ class WasmPrinter(WasmVisitor):
             result += f' (export "{memory.export}")'
         result += f" {memory.size}"
         result += ")\n"
+
+        return result
+
+    def visit_store(self, store: Store):
+        result = self.with_indentation(f"({store.type}.store") + "\n"
+        self.indentation += 1
+        result += store.location.accept(self)
+        result += store.val.accept(self)
+        self.indentation -= 1
+        result += self.with_indentation(")") + "\n"
 
         return result
 

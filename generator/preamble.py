@@ -27,11 +27,14 @@ def preamble() -> List[Instruction]:
     heap_pointer = Global(
         name="$heap_pointer", type="mut i32", value=Const(type="i32", val="10")
     )
+    self_pointer = Global(
+        name="$self_pointer", type="mut i32", value=Const(type="i32", val="0")
+    )
 
     # Simple bump allocator, functionally equivalent to:
     # export function malloc(required_bytes: i32): i32 {
     #   let location = heap_pointer
-    #   heap_pointer += required_bytes
+    #   heap_pointer += 4 * required_bytes
     #   return location
     # }
     malloc = Func(
@@ -46,7 +49,13 @@ def preamble() -> List[Instruction]:
                 val=(
                     BinaryOperation(
                         op="i32.add",
-                        left=GetGlobal(name="$heap_pointer"),
+                        left=(
+                            BinaryOperation(
+                                op="i32.mult",
+                                left=(Const(type="i32", val="4")),
+                                right=GetGlobal(name="$heap_pointer"),
+                            )
+                        ),
                         right=GetLocal(name="$required_bytes"),
                     )
                 ),
@@ -54,7 +63,7 @@ def preamble() -> List[Instruction]:
         ],
     )
 
-    return [allocate_memory, heap_pointer, malloc]
+    return [allocate_memory, heap_pointer, self_pointer, malloc]
 
 
 def with_preamble(module: Module) -> Module:

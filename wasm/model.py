@@ -188,6 +188,16 @@ class SetGlobal(Instruction):
 
 
 @dataclass
+class Store(Instruction):
+    type: str
+    location: Instruction
+    val: Instruction
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_store(self)
+
+
+@dataclass
 class Memory(Instruction):
     size: int
     export: Optional[str]
@@ -281,4 +291,8 @@ class WasmVisitor:
 
     @abstractmethod
     def visit_memory(self, memory: Memory):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_store(self, store: Store):
         raise NotImplementedError()

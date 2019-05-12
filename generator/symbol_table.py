@@ -8,6 +8,7 @@ class SymbolType(Enum):
     LOCAL = 1
     PARAM = 2
     FUNC = 3
+    DATA = 4
 
 
 @dataclass
@@ -18,6 +19,9 @@ class Symbol:
 
     @property
     def generated_name(self):
+        if self.kind is SymbolType.DATA:
+            return f"${self.name}.new"
+
         return f"${self.name}"
 
 

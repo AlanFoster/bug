@@ -18,6 +18,7 @@ from wasm.model import (
     GetGlobal,
     SetGlobal,
     Global,
+    Store,
 )
 from wasm.printer import pretty_print
 
@@ -204,7 +205,25 @@ def test_returns(snapshot):
 
 
 def test_memory(snapshot):
-    source = Module(imports=[], instructions=[Memory(size=1, export="memory")])
+    source = Module(
+        imports=[],
+        instructions=[
+            Memory(size=1, export="memory"),
+            Func(
+                name="$set_memory",
+                params=[],
+                locals=[],
+                result=None,
+                instructions=[
+                    Store(
+                        type="i32",
+                        location=Const(type="i32", val="0"),
+                        val=Const(type="i32", val="1337"),
+                    )
+                ],
+            ),
+        ],
+    )
     wasm_result = pretty_print(source)
     snapshot.assert_match(wasm_result)
 

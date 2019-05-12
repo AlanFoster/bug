@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
@@ -93,7 +94,7 @@ class DataDef(Node):
     functions: List[Function]
 
     def accept(self, visitor: "AstVisitor"):
-        return visitor.visit_data(self)
+        return visitor.visit_data_def(self)
 
 
 @dataclass
@@ -151,44 +152,58 @@ class Program:
 
 
 class AstVisitor:
+    @abstractmethod
     def visit_program(self, program: Program):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_number(self, number: Number):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_variable(self, variable: Variable):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_let(self, let: Let):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_return(self, return_: Return):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_function_call(self, function_call: FunctionCall):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_function(self, function: Function):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_argument(self, argument: Argument):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_import(self, import_: Import):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_binary_operation(self, binary_operation: BinaryOperation):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_param(self, param: Param):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_if(self, if_: If):
         raise NotImplementedError()
 
-    def visit_data(self, data: DataDef):
+    @abstractmethod
+    def visit_data_def(self, data: DataDef):
         raise NotImplementedError()
 
+    @abstractmethod
     def visit_member_access(self, member: MemberAccess):
         raise NotImplementedError()

@@ -25,7 +25,7 @@ snapshots['test_globals 1'] = '''(module
 '''
 
 snapshots['test_simple_expression 1'] = '''(module
-    (func $output_println (param i32))
+    (func $output_println (import "System::Output" "println") (param i32))
     (func $Main (export "Main")
         (call
             $output_println
@@ -42,7 +42,7 @@ snapshots['test_simple_expression 1'] = '''(module
 '''
 
 snapshots['test_function_call_with_params_and_locals 1'] = '''(module
-    (func $output_println (param i32))
+    (func $output_println (import "System::Output" "println") (param i32))
     (func $add (param $a i32) (param $b i32) (result i32)
         (local $answer i32)
         (set_local $answer
@@ -76,7 +76,7 @@ snapshots['test_function_call_with_params_and_locals 1'] = '''(module
 '''
 
 snapshots['test_conditionals 1'] = '''(module
-    (func $output_println (param i32))
+    (func $output_println (import "System::Output" "println") (param i32))
     (func $Foo (result i32)
         (if
             (i32.lt_s
@@ -115,7 +115,7 @@ snapshots['test_conditionals 1'] = '''(module
 '''
 
 snapshots['test_returns 1'] = '''(module
-    (func $output_println (param i32))
+    (func $output_println (import "System::Output" "println") (param i32))
     (func $meaning_of_life (result i32)
         (return
             (i32.const 42)
@@ -141,5 +141,12 @@ snapshots['test_returns 1'] = '''(module
 
 snapshots['test_memory 1'] = '''(module
     (memory (export "memory") 1)
+
+    (func $set_memory
+        (i32.store
+            (i32.const 0)
+            (i32.const 1337)
+        )
+    )
 )
 '''

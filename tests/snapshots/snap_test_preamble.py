@@ -14,11 +14,18 @@ snapshots['test_preamble 1'] = '''(module
         (i32.const 10)
     )
 
+    (global $self_pointer (mut i32)
+        (i32.const 0)
+    )
+
     (func $malloc (param $required_bytes i32) (result i32)
         (global.get $heap_pointer)
         (global.set $heap_pointer
             (i32.add
-                (global.get $heap_pointer)
+                (i32.mult
+                    (i32.const 4)
+                    (global.get $heap_pointer)
+                )
                 (get_local $required_bytes)
             )
         )

@@ -15,6 +15,9 @@ from wasm.model import (
     Nop,
     Return,
     Import,
+    GetGlobal,
+    SetGlobal,
+    Store,
 )
 
 
@@ -45,12 +48,17 @@ class AstVisitor(ast.AstVisitor):
             imports.append(import_.accept(self))
 
         self.symbol_table = self.symbol_table.enter_scope()
+        data_defs = []
+        for data_def in program.data_defs:
+            data_defs.append(data_def.accept(self))
+
         functions = []
         for function in program.functions:
             functions.append(function.accept(self))
         self.symbol_table = self.symbol_table.exit_scope()
 
         instructions = []
+        instructions += data_defs
         instructions += functions
 
         return Module(imports=imports, instructions=instructions)
@@ -80,8 +88,10 @@ class AstVisitor(ast.AstVisitor):
             function_name = "$output_println"
         elif self.symbol_table.has(function_call.name):
             symbol = self.symbol_table.get(function_call.name)
-            if symbol.kind is not SymbolType.FUNC:
-                raise NotImplementedError(f"{function_call.name} is not a function")
+            if symbol.kind not in (SymbolType.FUNC, SymbolType.DATA):
+                raise NotImplementedError(
+                    f"{function_call.name} is not a function or data"
+                )
 
             function_name = symbol.generated_name
         else:
@@ -174,4 +184,47 @@ class AstVisitor(ast.AstVisitor):
             result=None,
             then_statements=then_statements,
             else_statements=else_statements if else_statements else None,
+        )
+
+    def visit_data_def(self, data: ast.DataDef):
+        self.symbol_table.add(
+            Symbol(name=data.name, type=data.name, kind=SymbolType.DATA)
+        )
+
+        malloc_self = SetGlobal(
+            name="$self_pointer",
+            val=Call(name="$malloc", arguments=[Const(type="i32", val="2")]),
+        )
+
+        func_params = []
+        assign_params = []
+        for index, param in enumerate(data.params):
+            func_params.append(Param(type=param.type, name=f"${param.name}"))
+            assign_params.append(
+                Store(
+                    type=param.type,
+                    location=(
+                        BinaryOperation(
+                            op="i32.add",
+                            left=GetGlobal(name="$self_pointer"),
+                            right=Const(type="i32", val=str(4 * index)),
+                        )
+                    ),
+                    val=GetLocal(name=f"${param.name}"),
+                )
+            )
+
+        return_self = GetGlobal(name="$self_pointer")
+
+        instructions = []
+        instructions += [malloc_self]
+        instructions += assign_params
+        instructions += [return_self]
+
+        return Func(
+            name=f"${data.name}.new",
+            export=None,
+            params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
+            result=Result(type="i32"),
+            instructions=instructions,
         )
