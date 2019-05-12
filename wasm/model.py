@@ -15,6 +15,7 @@ class Instruction:
 
 @dataclass
 class Module:
+    imports: List["Import"]
     instructions: List[Instruction]
 
     def accept(self, visitor: "WasmVisitor"):
@@ -45,6 +46,18 @@ class Result:
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_result(self)
+
+
+@dataclass
+class Import(Instruction):
+    name: Optional[str] = None
+    export: Optional[str] = None
+    import_: Optional[Any] = None
+    params: List[Param] = None
+    result: Optional[Result] = None
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_import(self)
 
 
 @dataclass
@@ -148,6 +161,42 @@ class Nop(Instruction):
 
 
 @dataclass
+class Global(Instruction):
+    name: str
+    type: str
+    value: Instruction
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_global(self)
+
+
+@dataclass
+class GetGlobal(Instruction):
+    name: str
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_get_global(self)
+
+
+@dataclass
+class SetGlobal(Instruction):
+    name: str
+    val: Instruction
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_set_global(self)
+
+
+@dataclass
+class Memory(Instruction):
+    size: int
+    export: Optional[str]
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_memory(self)
+
+
+@dataclass
 class Drop:
     """
      The drop operator throws away a single operand
@@ -183,6 +232,10 @@ class WasmVisitor:
         raise NotImplementedError()
 
     @abstractmethod
+    def visit_import(self, import_: Import):
+        raise NotImplementedError()
+
+    @abstractmethod
     def visit_func(self, func: Func):
         raise NotImplementedError()
 
@@ -212,4 +265,20 @@ class WasmVisitor:
 
     @abstractmethod
     def visit_nop(self, return_: Return):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_global(self, global_: Global):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_get_global(self, get_global: GetGlobal):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_set_global(self, set_global: SetGlobal):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_memory(self, memory: Memory):
         raise NotImplementedError()

@@ -12,6 +12,7 @@ from wasm.model import (
     Result,
     If,
     Return,
+    Import,
 )
 from compiler import compiler
 
@@ -27,7 +28,7 @@ def test_empty_program():
     source = ""
     result = get_wasm(source)
 
-    assert result == Module([])
+    assert result == Module(imports=[], instructions=[])
 
 
 def test_simple_expression():
@@ -41,12 +42,14 @@ def test_simple_expression():
     result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$Main",
                 export="Main",
@@ -68,8 +71,8 @@ def test_simple_expression():
                         ],
                     )
                 ],
-            ),
-        ]
+            )
+        ],
     )
 
 
@@ -83,15 +86,17 @@ def test_simple_assignment():
             println(value=a + b);
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$Main",
                 export="Main",
@@ -111,8 +116,8 @@ def test_simple_assignment():
                         ],
                     ),
                 ],
-            ),
-        ]
+            )
+        ],
     )
 
 
@@ -128,15 +133,17 @@ def test_function_call_with_no_arguments():
             sayNumber();
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$sayNumber",
                 params=[],
@@ -156,7 +163,7 @@ def test_function_call_with_no_arguments():
                 locals=[],
                 instructions=[Call(name="$sayNumber", arguments=[])],
             ),
-        ]
+        ],
     )
 
 
@@ -172,15 +179,17 @@ def test_function_call_with_arguments():
             println(value=add(a=5, b=15));
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$add",
                 params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
@@ -214,7 +223,7 @@ def test_function_call_with_arguments():
                     )
                 ],
             ),
-        ]
+        ],
     )
 
 
@@ -228,15 +237,17 @@ def test_if_statement():
             }
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$Main",
                 export="Main",
@@ -259,8 +270,8 @@ def test_if_statement():
                         else_statements=None,
                     )
                 ],
-            ),
-        ]
+            )
+        ],
     )
 
 
@@ -276,15 +287,17 @@ def test_if_else_statement():
             }
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$Main",
                 export="Main",
@@ -312,8 +325,8 @@ def test_if_else_statement():
                         ],
                     )
                 ],
-            ),
-        ]
+            )
+        ],
     )
 
 
@@ -334,15 +347,17 @@ def test_factorial():
             println(value=factorial(n=5));
         }
      """
-    result = compiler.generate(antlr4.InputStream(source))
+    result = get_wasm(source)
 
     assert result == Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$factorial",
                 export=None,
@@ -402,5 +417,5 @@ def test_factorial():
                     )
                 ],
             ),
-        ]
+        ],
     )

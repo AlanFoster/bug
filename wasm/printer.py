@@ -14,6 +14,11 @@ from .model import (
     Return,
     Drop,
     Nop,
+    Memory,
+    SetGlobal,
+    GetGlobal,
+    Global,
+    Import,
 )
 
 
@@ -25,9 +30,28 @@ class WasmPrinter(WasmVisitor):
         result = "(module\n"
 
         self.indentation += 1
+        imports = [import_.accept(self) for import_ in module.imports]
+        result += "\n".join(imports)
         instructions = [instruction.accept(self) for instruction in module.instructions]
         result += "\n".join(instructions)
         self.indentation -= 1
+        result += ")\n"
+
+        return result
+
+    def visit_import(self, import_: Import):
+        result = self.with_indentation("(func")
+
+        if import_.name:
+            result += " " + import_.name
+
+        if import_.params:
+            params = [param.accept(self) for param in import_.params]
+            result += " " + " ".join(params)
+
+        if import_.result:
+            result += " " + import_.result.accept(self)
+
         result += ")\n"
 
         return result
@@ -179,6 +203,39 @@ class WasmPrinter(WasmVisitor):
 
     def visit_nop(self, nop: Nop):
         return self.with_indentation("(nop)") + "\n"
+
+    def visit_global(self, global_: Global):
+        result = self.with_indentation(f"(global {global_.name} ({global_.type})")
+        result += "\n"
+        self.indentation += 1
+        result += global_.value.accept(self)
+        self.indentation -= 1
+        result += self.with_indentation(")") + "\n"
+
+        return result
+
+    def visit_get_global(self, get_global: GetGlobal):
+        return self.with_indentation(f"(global.get {get_global.name})") + "\n"
+
+    def visit_set_global(self, set_global: SetGlobal):
+        result = self.with_indentation(f"(global.set {set_global.name}") + "\n"
+
+        self.indentation += 1
+        result += set_global.val.accept(self)
+        self.indentation -= 1
+
+        result += self.with_indentation(")") + "\n"
+
+        return result
+
+    def visit_memory(self, memory: Memory):
+        result = self.with_indentation("(memory")
+        if memory.export:
+            result += f' (export "{memory.export}")'
+        result += f" {memory.size}"
+        result += ")\n"
+
+        return result
 
     def with_indentation(self, str):
         return ("    " * self.indentation) + str

@@ -14,6 +14,7 @@ from wasm.model import (
     If,
     Nop,
     Return,
+    Import,
 )
 
 
@@ -50,9 +51,9 @@ class AstVisitor(ast.AstVisitor):
         self.symbol_table = self.symbol_table.exit_scope()
 
         instructions = []
-        instructions += imports
         instructions += functions
-        return Module(instructions=instructions)
+
+        return Module(imports=imports, instructions=instructions)
 
     def visit_number(self, number: ast.Number):
         return Const(type="i32", val=str(number.value))
@@ -140,10 +141,11 @@ class AstVisitor(ast.AstVisitor):
                 f"Import statement '{import_.value}' not yet supported."
             )
 
-        return Func(
+        return Import(
             name="$output_println",
             import_=("System::Output", "println"),
             params=[Param("i32")],
+            result=None,
         )
 
     def visit_binary_operation(self, binary_operation: ast.BinaryOperation):

@@ -1,5 +1,6 @@
 from wasm.model import (
     Module,
+    Import,
     Func,
     BinaryOperation,
     Call,
@@ -13,18 +14,24 @@ from wasm.model import (
     Drop,
     Return,
     Nop,
+    Memory,
+    GetGlobal,
+    SetGlobal,
+    Global,
 )
 from wasm.printer import pretty_print
 
 
 def test_simple_expression(snapshot):
     source = Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$Main",
                 export="Main",
@@ -44,8 +51,8 @@ def test_simple_expression(snapshot):
                         ],
                     )
                 ],
-            ),
-        ]
+            )
+        ],
     )
     wasm_result = pretty_print(source)
     snapshot.assert_match(wasm_result)
@@ -53,12 +60,14 @@ def test_simple_expression(snapshot):
 
 def test_function_call_with_params_and_locals(snapshot):
     source = Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$add",
                 params=[Param(type="i32", name="$a"), Param(type="i32", name="$b")],
@@ -94,7 +103,7 @@ def test_function_call_with_params_and_locals(snapshot):
                     ),
                 ],
             ),
-        ]
+        ],
     )
     wasm_result = pretty_print(source)
     snapshot.assert_match(wasm_result)
@@ -102,12 +111,14 @@ def test_function_call_with_params_and_locals(snapshot):
 
 def test_conditionals(snapshot):
     source = Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$Foo",
                 result=Result(type="i32"),
@@ -147,7 +158,7 @@ def test_conditionals(snapshot):
                 locals=[],
                 instructions=[Call(name="$Foo", arguments=[]), Drop()],
             ),
-        ]
+        ],
     )
     wasm_result = pretty_print(source)
     snapshot.assert_match(wasm_result)
@@ -155,12 +166,14 @@ def test_conditionals(snapshot):
 
 def test_returns(snapshot):
     source = Module(
-        [
-            Func(
+        imports=[
+            Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
-            ),
+            )
+        ],
+        instructions=[
             Func(
                 name="$meaning_of_life",
                 result=Result(type="i32"),
@@ -184,7 +197,44 @@ def test_returns(snapshot):
                 locals=[],
                 instructions=[Call(name="$output_meaning_of_life", arguments=[])],
             ),
-        ]
+        ],
     )
+    wasm_result = pretty_print(source)
+    snapshot.assert_match(wasm_result)
+
+
+def test_memory(snapshot):
+    source = Module(imports=[], instructions=[Memory(size=1, export="memory")])
+    wasm_result = pretty_print(source)
+    snapshot.assert_match(wasm_result)
+
+
+def test_globals(snapshot):
+    source = Module(
+        imports=[],
+        instructions=[
+            Global(name="$count", type="mut i32", value=Const(type="i32", val="0")),
+            Func(
+                name="$increment_count",
+                params=[],
+                locals=[],
+                result=Result(type="i32"),
+                instructions=[
+                    SetGlobal(
+                        name="$count",
+                        val=(
+                            BinaryOperation(
+                                op="i32.add",
+                                left=GetGlobal(name="$count"),
+                                right=Const(type="i32", val="1"),
+                            )
+                        ),
+                    ),
+                    GetGlobal(name="$count"),
+                ],
+            ),
+        ],
+    )
+
     wasm_result = pretty_print(source)
     snapshot.assert_match(wasm_result)

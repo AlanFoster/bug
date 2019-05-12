@@ -1,9 +1,11 @@
 import antlr4
+
+import compiler.ast as ast
+from generator.ast_visitor import AstVisitor
+from generator.preamble import with_preamble
 from parser.BugLexer import BugLexer
 from parser.BugParser import BugParser
-import compiler.ast as ast
 from wasm.model import Module
-from generator.ast_visitor import AstVisitor
 from .parse_tree_visitor import ParseTreeVisitor
 
 
@@ -32,5 +34,6 @@ def generate(input_stream: antlr4.InputStream) -> Module:
     parse_tree = get_parse_tree(input_stream)
     ast = get_ast(parse_tree)
     wasm = get_wasm(ast)
+    module = with_preamble(wasm)
 
-    return wasm
+    return module
