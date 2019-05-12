@@ -194,6 +194,7 @@ class ParseTreeVisitor(BugParserVisitor):
 
     # Visit a parse tree produced by BugParser#callExpression.
     def visitCallExpression(self, ctx: BugParser.CallExpressionContext):
+        # TODO: The expression should be stored within the call expression, rather than as text
         name = ctx.expression().getText()
         arguments = self.visit(ctx.argumentList()) if ctx.argumentList() else []
         return FunctionCall(name=name, arguments=arguments)

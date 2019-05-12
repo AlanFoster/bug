@@ -108,6 +108,7 @@ class MemberAccess(Node):
 
 @dataclass
 class FunctionCall(Node):
+    # TODO: This should most likely be an expression to support something like (a.b.c)()
     name: str
     arguments: List[Argument]
 
@@ -144,8 +145,8 @@ class Variable(Node):
 @dataclass
 class Program:
     imports: List[Import]
-    functions: List[Function]
     data_defs: List[DataDef]
+    functions: List[Function]
 
     def accept(self, visitor: "AstVisitor"):
         return visitor.visit_program(self)

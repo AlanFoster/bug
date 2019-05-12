@@ -31,15 +31,19 @@ class SymbolTable:
         raise NotImplementedError()
 
     @abstractmethod
-    def get(self, name: str):
+    def get(self, name: str) -> Symbol:
         raise NotImplementedError()
 
     @abstractmethod
-    def enter_scope(self):
+    def enter_scope(self) -> "SymbolTable":
         raise NotImplementedError()
 
     @abstractmethod
-    def exit_scope(self):
+    def exit_scope(self) -> "SymbolTable":
+        raise NotImplementedError()
+
+    @abstractmethod
+    def tree(self, depth: int = 0) -> str:
         raise NotImplementedError()
 
 
@@ -47,17 +51,20 @@ class EmptySymbolTable(SymbolTable):
     def add(self, symbol: Symbol):
         raise NotImplementedError()
 
-    def get(self, name):
+    def get(self, name) -> Symbol:
         raise ValueError(f"Missing variable '{name}'.")
 
-    def has(self, name):
+    def has(self, name) -> bool:
         return False
 
-    def enter_scope(self):
+    def enter_scope(self) -> SymbolTable:
         return ChildSymbolTable(self)
 
-    def exit_scope(self):
+    def exit_scope(self) -> SymbolTable:
         raise NotImplementedError()
+
+    def tree(self, depth: int = 0) -> str:
+        return "[Empty]"
 
 
 @dataclass
@@ -70,23 +77,29 @@ class ChildSymbolTable(SymbolTable):
             raise ValueError(f"Duplicate variable {symbol.name} found.")
         self.symbols[symbol.name] = symbol
 
-    def get(self, name: str):
+    def get(self, name: str) -> Symbol:
         if name in self.symbols:
             return self.symbols[name]
 
         return self.parent.get(name)
 
-    def has(self, name: str):
+    def has(self, name: str) -> bool:
         if name in self.symbols:
             return True
 
-        return self.parent.get(name)
+        return self.parent.has(name)
 
-    def enter_scope(self):
+    def enter_scope(self) -> SymbolTable:
         return ChildSymbolTable(self)
 
-    def exit_scope(self):
+    def exit_scope(self) -> SymbolTable:
         return self.parent
 
     def locals(self):
         return [v for k, v in self.symbols.items() if v.kind is SymbolType.LOCAL]
+
+    def tree(self, depth: int = 0) -> str:
+        symbols = ", ".join(
+            [f"({symbol.name}: {symbol.type})" for _key, symbol in self.symbols.items()]
+        )
+        return f"[{symbols}]" + "\n->" + self.parent.tree(depth + 1)

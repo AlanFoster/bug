@@ -463,6 +463,73 @@ def test_data_vector_with_simple_function():
     )
 
 
+def test_data_vector_with_simple_function_call():
+    source = """
+        import System::Output;
+
+        export data Vector(x: i32, y: i32) {
+            function length(): i32 {
+                42;
+            }
+        }
+
+        export function Main(): void {
+            let vector = Vector(x=10, y=20);
+            println(value=vector.length());
+        }
+     """
+    result = get_ast(source)
+
+    assert result == Program(
+        imports=[Import(value="System::Output")],
+        data_defs=[
+            DataDef(
+                name="Vector",
+                is_exported=True,
+                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
+                functions=[
+                    Function(
+                        name="length",
+                        is_exported=False,
+                        params=[],
+                        result="i32",
+                        body=[Number(value=42)],
+                    )
+                ],
+            )
+        ],
+        functions=[
+            Function(
+                name="Main",
+                is_exported=True,
+                params=[],
+                result=None,
+                body=[
+                    Let(
+                        name="vector",
+                        value=FunctionCall(
+                            name="Vector",
+                            arguments=[
+                                Argument(name="x", value=Number(value=10)),
+                                Argument(name="y", value=Number(value=20)),
+                            ],
+                        ),
+                    ),
+                    FunctionCall(
+                        name="println",
+                        arguments=[
+                            Argument(
+                                name="value",
+                                value=FunctionCall(name="vector.length", arguments=[]),
+                            )
+                        ],
+                    ),
+                ],
+            )
+        ],
+    )
+
+
 def test_data_vector_with_complex_function():
     # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
     source = """

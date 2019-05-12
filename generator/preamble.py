@@ -51,7 +51,7 @@ def preamble() -> List[Instruction]:
                         op="i32.add",
                         left=(
                             BinaryOperation(
-                                op="i32.mult",
+                                op="i32.mul",
                                 left=(Const(type="i32", val="4")),
                                 right=GetGlobal(name="$heap_pointer"),
                             )

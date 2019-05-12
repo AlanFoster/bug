@@ -22,7 +22,7 @@ snapshots['test_preamble 1'] = '''(module
         (global.get $heap_pointer)
         (global.set $heap_pointer
             (i32.add
-                (i32.mult
+                (i32.mul
                     (i32.const 4)
                     (global.get $heap_pointer)
                 )

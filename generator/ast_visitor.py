@@ -41,6 +41,7 @@ def get_binary_operator(operator):
 class AstVisitor(ast.AstVisitor):
     def __init__(self):
         self.symbol_table: EmptySymbolTable = EmptySymbolTable()
+        self.data_name = None
 
     def visit_program(self, program: ast.Program):
         imports = []
@@ -50,7 +51,7 @@ class AstVisitor(ast.AstVisitor):
         self.symbol_table = self.symbol_table.enter_scope()
         data_defs = []
         for data_def in program.data_defs:
-            data_defs.append(data_def.accept(self))
+            data_defs += data_def.accept(self)
 
         functions = []
         for function in program.functions:
@@ -73,7 +74,7 @@ class AstVisitor(ast.AstVisitor):
     def visit_let(self, let: ast.Let):
         expression = let.value.accept(self)
         # TODO: ast.Assignments should infer the expression type / support explicit types: ast.`let a: ast.i32 = expression;`
-        type_ = "i32"
+        type_ = "Vector" if let.name == "vector" else "i32"
         symbol = Symbol(name=let.name, type=type_, kind=SymbolType.LOCAL)
         self.symbol_table.add(symbol)
 
@@ -83,6 +84,8 @@ class AstVisitor(ast.AstVisitor):
         return Return(expression=return_.value.accept(self) if return_.value else Nop())
 
     def visit_function_call(self, function_call: ast.FunctionCall):
+        is_method_access = "." in function_call.name
+
         # Note: ast.This will need to use a real symbol table in the future
         if function_call.name == "println":
             function_name = "$output_println"
@@ -94,19 +97,36 @@ class AstVisitor(ast.AstVisitor):
                 )
 
             function_name = symbol.generated_name
+        elif is_method_access:
+            # crudely support member access for now, this should be properly
+            # implemented with Call containing an expression in the future
+            target, method = function_call.name.split(".")
+            target_symbol = self.symbol_table.get(target)
+            function_symbol = self.symbol_table.get(f"{target_symbol.type}.{method}")
+            function_name = function_symbol.generated_name
         else:
             raise NotImplementedError(f"{function_call.name} not supported")
         arguments = []
+
+        # Additionally prepend the `self` argument to this function call
+        if is_method_access:
+            arguments.append(GetLocal(name=target_symbol.generated_name))
         for argument in function_call.arguments:
             arguments.append(argument.accept(self))
 
         return Call(name=function_name, arguments=arguments)
 
     def visit_function(self, function: ast.Function):
+        # Data definitions can have associated functions, in this case they will be compiled as:
+        # `Vector.foo`, otherwise the normal function name will be used `foo`
+        function_name = (
+            f"{self.data_name}.{function.name}" if self.data_name else function.name
+        )
+
         # Place the current function into the symbol table so that it can be called by
         # other functions later, or recursively if required.
         function_symbol = Symbol(
-            name=function.name, type=function.result, kind=SymbolType.FUNC
+            name=function_name, type=function.result, kind=SymbolType.FUNC
         )
         self.symbol_table.add(function_symbol)
         self.symbol_table = self.symbol_table.enter_scope()
@@ -116,7 +136,7 @@ class AstVisitor(ast.AstVisitor):
         for param in function.params:
             symbol = Symbol(name=param.name, type=param.type, kind=SymbolType.PARAM)
             self.symbol_table.add(symbol)
-            params.append(Param(type=symbol.type, name=symbol.generated_name))
+            params.append(Param(type="i32", name=symbol.generated_name))
         body = []
         for statement in function.body:
             body.append(statement.accept(self))
@@ -124,7 +144,9 @@ class AstVisitor(ast.AstVisitor):
         # After visiting the function body, any local variables will now be in the symbol table
         locals_ = []
         for symbol in self.symbol_table.locals():
-            locals_.append(Local(type=symbol.type, name=symbol.generated_name))
+            # TODO: This should correctly understand that class types will be pointers, i.e. i32
+            type_ = "i32" if symbol.name == "vector" else symbol.type
+            locals_.append(Local(type=type_, name=symbol.generated_name))
         self.symbol_table = self.symbol_table.exit_scope()
 
         return Func(
@@ -187,6 +209,8 @@ class AstVisitor(ast.AstVisitor):
         )
 
     def visit_data_def(self, data: ast.DataDef):
+        self.data_name = data.name
+
         self.symbol_table.add(
             Symbol(name=data.name, type=data.name, kind=SymbolType.DATA)
         )
@@ -196,10 +220,12 @@ class AstVisitor(ast.AstVisitor):
             val=Call(name="$malloc", arguments=[Const(type="i32", val="2")]),
         )
 
-        func_params = []
+        params = []
         assign_params = []
         for index, param in enumerate(data.params):
-            func_params.append(Param(type=param.type, name=f"${param.name}"))
+            # TODO: This should correctly understand that class types will be pointers, i.e. i32
+            type_ = "i32" if param.name == "self" else param.type
+            params.append(Param(type=type_, name=f"${param.name}"))
             assign_params.append(
                 Store(
                     type=param.type,
@@ -221,10 +247,18 @@ class AstVisitor(ast.AstVisitor):
         instructions += assign_params
         instructions += [return_self]
 
-        return Func(
+        constructor = Func(
             name=f"${data.name}.new",
             export=None,
-            params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
+            params=params,
             result=Result(type="i32"),
+            locals=[],
             instructions=instructions,
         )
+
+        data_funcs = []
+        for func in data.functions:
+            data_funcs.append(func.accept(self))
+        self.data_name = None
+
+        return [constructor] + data_funcs
