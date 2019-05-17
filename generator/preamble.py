@@ -25,7 +25,7 @@ def preamble() -> List[Instruction]:
     """
     allocate_memory = Memory(size=1, export="memory")
     heap_pointer = Global(
-        name="$heap_pointer", type="mut i32", value=Const(type="i32", val="10")
+        name="$heap_pointer", type="mut i32", value=Const(type="i32", val="12")
     )
     self_pointer = Global(
         name="$self_pointer", type="mut i32", value=Const(type="i32", val="0")

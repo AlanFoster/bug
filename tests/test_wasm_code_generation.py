@@ -16,6 +16,7 @@ from wasm.model import (
     SetGlobal,
     GetGlobal,
     Store,
+    Load,
 )
 from compiler import compiler
 
@@ -503,7 +504,7 @@ def test_data_vector_constructor():
 
         export function Main(): void {
             let vector = Vector(x=10, y=20);
-}
+        }
      """
     result = get_wasm(source)
 
@@ -519,6 +520,8 @@ def test_data_vector_constructor():
             Func(
                 name="$Vector.new",
                 export=None,
+                import_=None,
+                locals=[],
                 params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
                 result=Result(type="i32"),
                 instructions=[
@@ -556,6 +559,8 @@ def test_data_vector_constructor():
             Func(
                 name="$Main",
                 export="Main",
+                import_=None,
+                result=None,
                 params=[],
                 locals=[Local(type="i32", name="$vector")],
                 instructions=[
@@ -744,6 +749,273 @@ def test_data_vector_with_simple_function_call():
                         arguments=[
                             Call(
                                 name="$Vector.length",
+                                arguments=[GetLocal(name="$vector")],
+                            )
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def test_data_vector_with_self_getter_method():
+    source = """
+        import System::Output;
+
+        export data Vector(x: i32, y: i32) {
+            function getX(self: Vector): i32 {
+                self.x;
+            }
+        }
+
+        export function Main(): void {
+            let vector = Vector(x=10, y=20);
+            println(value=vector.getX());
+        }
+     """
+    result = get_wasm(source)
+
+    assert result == Module(
+        imports=[
+            Import(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            )
+        ],
+        instructions=[
+            Func(
+                name="$Vector.new",
+                export=None,
+                params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
+                result=Result(type="i32"),
+                locals=[],
+                instructions=[
+                    SetGlobal(
+                        name="$self_pointer",
+                        val=Call(
+                            name="$malloc", arguments=[Const(type="i32", val="2")]
+                        ),
+                    ),
+                    Store(
+                        type="i32",
+                        location=(
+                            BinaryOperation(
+                                op="i32.add",
+                                left=GetGlobal(name="$self_pointer"),
+                                right=Const(type="i32", val="0"),
+                            )
+                        ),
+                        val=GetLocal(name="$x"),
+                    ),
+                    Store(
+                        type="i32",
+                        location=(
+                            BinaryOperation(
+                                op="i32.add",
+                                left=GetGlobal(name="$self_pointer"),
+                                right=Const(type="i32", val="4"),
+                            )
+                        ),
+                        val=GetLocal(name="$y"),
+                    ),
+                    GetGlobal(name="$self_pointer"),
+                ],
+            ),
+            Func(
+                name="$Vector.getX",
+                export=None,
+                params=[Param(type="i32", name="$self")],
+                result=Result(type="i32"),
+                locals=[],
+                instructions=[
+                    Load(
+                        type="i32",
+                        location=BinaryOperation(
+                            op="i32.add",
+                            left=GetLocal("$self"),
+                            right=BinaryOperation(
+                                op="i32.mul",
+                                left=Const(type="i32", val="0"),
+                                right=Const(type="i32", val="4"),
+                            ),
+                        ),
+                    )
+                ],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                params=[],
+                locals=[Local(name="$vector", type="i32")],
+                instructions=[
+                    SetLocal(
+                        name="$vector",
+                        val=Call(
+                            name="$Vector.new",
+                            arguments=[
+                                Const(type="i32", val="10"),
+                                Const(type="i32", val="20"),
+                            ],
+                        ),
+                    ),
+                    Call(
+                        name="$output_println",
+                        arguments=[
+                            Call(
+                                name="$Vector.getX",
+                                arguments=[GetLocal(name="$vector")],
+                            )
+                        ],
+                    ),
+                ],
+            ),
+        ],
+    )
+
+
+def test_data_vector_with_self_getter_methods():
+    source = """
+        import System::Output;
+
+        export data Vector(x: i32, y: i32) {
+            function getX(self: Vector): i32 {
+                self.x
+            }
+
+            function getY(self: Vector): i32 {
+                self.y
+            }
+        }
+
+        export function Main(): void {
+            let vector = Vector(x=10, y=20);
+            println(value=vector.getX());
+            println(value=vector.getY());
+        }
+     """
+    result = get_wasm(source)
+
+    assert result == Module(
+        imports=[
+            Import(
+                name="$output_println",
+                import_=("System::Output", "println"),
+                params=[Param("i32")],
+            )
+        ],
+        instructions=[
+            Func(
+                name="$Vector.new",
+                export=None,
+                params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
+                result=Result(type="i32"),
+                locals=[],
+                instructions=[
+                    SetGlobal(
+                        name="$self_pointer",
+                        val=Call(
+                            name="$malloc", arguments=[Const(type="i32", val="2")]
+                        ),
+                    ),
+                    Store(
+                        type="i32",
+                        location=(
+                            BinaryOperation(
+                                op="i32.add",
+                                left=GetGlobal(name="$self_pointer"),
+                                right=Const(type="i32", val="0"),
+                            )
+                        ),
+                        val=GetLocal(name="$x"),
+                    ),
+                    Store(
+                        type="i32",
+                        location=(
+                            BinaryOperation(
+                                op="i32.add",
+                                left=GetGlobal(name="$self_pointer"),
+                                right=Const(type="i32", val="4"),
+                            )
+                        ),
+                        val=GetLocal(name="$y"),
+                    ),
+                    GetGlobal(name="$self_pointer"),
+                ],
+            ),
+            Func(
+                name="$Vector.getX",
+                export=None,
+                params=[Param(type="i32", name="$self")],
+                result=Result(type="i32"),
+                locals=[],
+                instructions=[
+                    Load(
+                        type="i32",
+                        location=BinaryOperation(
+                            op="i32.add",
+                            left=GetLocal("$self"),
+                            right=BinaryOperation(
+                                op="i32.mul",
+                                left=Const(type="i32", val="0"),
+                                right=Const(type="i32", val="4"),
+                            ),
+                        ),
+                    )
+                ],
+            ),
+            Func(
+                name="$Vector.getY",
+                export=None,
+                params=[Param(type="i32", name="$self")],
+                result=Result(type="i32"),
+                locals=[],
+                instructions=[
+                    Load(
+                        type="i32",
+                        location=BinaryOperation(
+                            op="i32.add",
+                            left=GetLocal("$self"),
+                            right=BinaryOperation(
+                                op="i32.mul",
+                                left=Const(type="i32", val="1"),
+                                right=Const(type="i32", val="4"),
+                            ),
+                        ),
+                    )
+                ],
+            ),
+            Func(
+                name="$Main",
+                export="Main",
+                params=[],
+                locals=[Local(name="$vector", type="i32")],
+                instructions=[
+                    SetLocal(
+                        name="$vector",
+                        val=Call(
+                            name="$Vector.new",
+                            arguments=[
+                                Const(type="i32", val="10"),
+                                Const(type="i32", val="20"),
+                            ],
+                        ),
+                    ),
+                    Call(
+                        name="$output_println",
+                        arguments=[
+                            Call(
+                                name="$Vector.getX",
+                                arguments=[GetLocal(name="$vector")],
+                            )
+                        ],
+                    ),
+                    Call(
+                        name="$output_println",
+                        arguments=[
+                            Call(
+                                name="$Vector.getY",
                                 arguments=[GetLocal(name="$vector")],
                             )
                         ],

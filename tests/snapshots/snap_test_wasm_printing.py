@@ -147,6 +147,9 @@ snapshots['test_memory 1'] = '''(module
             (i32.const 0)
             (i32.const 1337)
         )
+        (i32.load
+            (i32.const 0)
+        )
     )
 )
 '''

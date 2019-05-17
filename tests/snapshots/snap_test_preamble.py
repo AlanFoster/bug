@@ -11,7 +11,7 @@ snapshots['test_preamble 1'] = '''(module
     (memory (export "memory") 1)
 
     (global $heap_pointer (mut i32)
-        (i32.const 10)
+        (i32.const 12)
     )
 
     (global $self_pointer (mut i32)

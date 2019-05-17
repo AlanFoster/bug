@@ -248,6 +248,15 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
+    def visit_load(self, store: Store):
+        result = self.with_indentation(f"({store.type}.load") + "\n"
+        self.indentation += 1
+        result += store.location.accept(self)
+        self.indentation -= 1
+        result += self.with_indentation(")") + "\n"
+
+        return result
+
     def with_indentation(self, str):
         return ("    " * self.indentation) + str
 

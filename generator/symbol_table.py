@@ -9,6 +9,7 @@ class SymbolType(Enum):
     PARAM = 2
     FUNC = 3
     DATA = 4
+    DATA_FIELD = 5
 
 
 @dataclass
@@ -16,6 +17,7 @@ class Symbol:
     name: str
     type: str
     kind: SymbolType
+    field_number: Optional[int] = None
 
     @property
     def generated_name(self):

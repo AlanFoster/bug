@@ -198,6 +198,15 @@ class Store(Instruction):
 
 
 @dataclass
+class Load(Instruction):
+    type: str
+    location: Instruction
+
+    def accept(self, visitor: "WasmVisitor"):
+        return visitor.visit_load(self)
+
+
+@dataclass
 class Memory(Instruction):
     size: int
     export: Optional[str]
@@ -295,4 +304,8 @@ class WasmVisitor:
 
     @abstractmethod
     def visit_store(self, store: Store):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_load(self, load: Load):
         raise NotImplementedError()

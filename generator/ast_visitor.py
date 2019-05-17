@@ -1,3 +1,6 @@
+from typing import Optional
+
+from compiler.ast import MemberAccess
 from .symbol_table import EmptySymbolTable, Symbol, SymbolType
 import compiler.ast as ast
 from wasm.model import (
@@ -18,6 +21,7 @@ from wasm.model import (
     GetGlobal,
     SetGlobal,
     Store,
+    Load,
 )
 
 
@@ -102,8 +106,7 @@ class AstVisitor(ast.AstVisitor):
             # implemented with Call containing an expression in the future
             target, method = function_call.name.split(".")
             target_symbol = self.symbol_table.get(target)
-            function_symbol = self.symbol_table.get(f"{target_symbol.type}.{method}")
-            function_name = function_symbol.generated_name
+            function_name = f"${target_symbol.type}.{method}"
         else:
             raise NotImplementedError(f"{function_call.name} not supported")
         arguments = []
@@ -157,6 +160,7 @@ class AstVisitor(ast.AstVisitor):
             params=params,
             result=Result(type=function.result) if function.result else None,
             locals=locals_,
+            import_=None,
             instructions=body,
         )
 
@@ -211,9 +215,12 @@ class AstVisitor(ast.AstVisitor):
     def visit_data_def(self, data: ast.DataDef):
         self.data_name = data.name
 
+        # Update the current symbol table with the current data class details
         self.symbol_table.add(
             Symbol(name=data.name, type=data.name, kind=SymbolType.DATA)
         )
+
+        # Specify all known functions
 
         malloc_self = SetGlobal(
             name="$self_pointer",
@@ -221,12 +228,12 @@ class AstVisitor(ast.AstVisitor):
         )
 
         params = []
-        assign_params = []
+        param_assignments = []
         for index, param in enumerate(data.params):
             # TODO: This should correctly understand that class types will be pointers, i.e. i32
             type_ = "i32" if param.name == "self" else param.type
             params.append(Param(type=type_, name=f"${param.name}"))
-            assign_params.append(
+            param_assignments.append(
                 Store(
                     type=param.type,
                     location=(
@@ -244,21 +251,64 @@ class AstVisitor(ast.AstVisitor):
 
         instructions = []
         instructions += [malloc_self]
-        instructions += assign_params
+        instructions += param_assignments
         instructions += [return_self]
 
         constructor = Func(
             name=f"${data.name}.new",
             export=None,
+            import_=None,
             params=params,
             result=Result(type="i32"),
             locals=[],
             instructions=instructions,
         )
 
+        # Enter a new scope when creating function definitions, and assign the data definitions fields
+        # so that they can be accessed later within the function bodies
+        self.symbol_table = self.symbol_table.enter_scope()
+        for index, param in enumerate(data.params):
+            self.symbol_table.add(
+                Symbol(
+                    name=param.name,
+                    type=param.type,
+                    kind=SymbolType.DATA_FIELD,
+                    field_number=index,
+                )
+            )
+
         data_funcs = []
         for func in data.functions:
             data_funcs.append(func.accept(self))
         self.data_name = None
+        self.symbol_table = self.symbol_table.exit_scope()
 
         return [constructor] + data_funcs
+
+    # TODO: Only works within self
+    def visit_member_access(self, member: MemberAccess):
+        target = member.value.name
+        if target != "self":
+            raise ValueError(f"No support added for {member} yet.")
+
+        target_symbol = self.symbol_table.get(target)
+        field_symbol = self.symbol_table.get(member.member)
+
+        # Load from memory the required field by calculating its field number relative to its self pointer
+        # field = self_pointer + (field_number * 4)
+        return Load(
+            type="i32",
+            location=(
+                BinaryOperation(
+                    op="i32.add",
+                    left=GetLocal(name=target_symbol.generated_name),
+                    right=(
+                        BinaryOperation(
+                            op="i32.mul",
+                            left=Const(type="i32", val=str(field_symbol.field_number)),
+                            right=Const(type="i32", val="4"),
+                        )
+                    ),
+                )
+            ),
+        )

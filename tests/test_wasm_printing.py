@@ -19,6 +19,7 @@ from wasm.model import (
     SetGlobal,
     Global,
     Store,
+    Load,
 )
 from wasm.printer import pretty_print
 
@@ -219,7 +220,8 @@ def test_memory(snapshot):
                         type="i32",
                         location=Const(type="i32", val="0"),
                         val=Const(type="i32", val="1337"),
-                    )
+                    ),
+                    Load(type="i32", location=Const(type="i32", val="0")),
                 ],
             ),
         ],
