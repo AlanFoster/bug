@@ -30,7 +30,7 @@ def test_simple_expression(snapshot):
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -70,7 +70,7 @@ def test_function_call_with_params_and_locals(snapshot):
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -125,7 +125,7 @@ def test_conditionals(snapshot):
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -184,7 +184,7 @@ def test_returns(snapshot):
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],

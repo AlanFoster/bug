@@ -179,7 +179,7 @@ class AstVisitor(ast.AstVisitor):
         return Import(
             name="$output_println",
             import_=("System::Output", "println"),
-            params=[Param("i32")],
+            params=[Param(type="i32", name=None)],
             result=None,
         )
 

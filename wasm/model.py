@@ -25,7 +25,7 @@ class Module:
 @dataclass
 class Param:
     type: str
-    name: str = None
+    name: Optional[str]
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_param(self)

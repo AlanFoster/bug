@@ -50,7 +50,7 @@ def test_simple_expression():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -99,7 +99,7 @@ def test_simple_assignment():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -148,7 +148,7 @@ def test_function_call_with_no_arguments():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -197,7 +197,7 @@ def test_function_call_with_arguments():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -258,7 +258,7 @@ def test_if_statement():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -310,7 +310,7 @@ def test_if_else_statement():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -372,7 +372,7 @@ def test_factorial():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -526,7 +526,7 @@ def test_data_vector_constructor():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -613,7 +613,7 @@ def test_data_vector_with_simple_function():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -664,7 +664,14 @@ def test_data_vector_with_simple_function():
                 locals=[],
                 instructions=[Const(type="i32", val="42")],
             ),
-            Func(name="$Main", export="Main", params=[], locals=[], result=None, instructions=[]),
+            Func(
+                name="$Main",
+                export="Main",
+                params=[],
+                locals=[],
+                result=None,
+                instructions=[],
+            ),
         ],
     )
 
@@ -691,7 +698,7 @@ def test_data_vector_with_simple_function_call():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -796,7 +803,7 @@ def test_data_vector_with_self_getter_method():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
@@ -919,7 +926,7 @@ def test_data_vector_with_self_getter_methods():
             Import(
                 name="$output_println",
                 import_=("System::Output", "println"),
-                params=[Param("i32")],
+                params=[Param(type="i32", name=None)],
                 result=None,
             )
         ],
