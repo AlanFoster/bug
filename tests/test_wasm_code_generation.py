@@ -51,6 +51,7 @@ def test_simple_expression():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -59,6 +60,7 @@ def test_simple_expression():
                 export="Main",
                 params=[],
                 locals=[],
+                result=None,
                 instructions=[
                     Call(
                         name="$output_println",
@@ -98,6 +100,7 @@ def test_simple_assignment():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -106,6 +109,7 @@ def test_simple_assignment():
                 export="Main",
                 params=[],
                 locals=[Local(type="i32", name="$a"), Local(type="i32", name="$b")],
+                result=None,
                 instructions=[
                     SetLocal(name="$a", val=Const(type="i32", val="5")),
                     SetLocal(name="$b", val=Const(type="i32", val="10")),
@@ -145,6 +149,7 @@ def test_function_call_with_no_arguments():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -153,6 +158,7 @@ def test_function_call_with_no_arguments():
                 params=[],
                 locals=[],
                 result=None,
+                export=None,
                 instructions=[
                     Call(
                         name="$output_println",
@@ -165,6 +171,7 @@ def test_function_call_with_no_arguments():
                 export="Main",
                 params=[],
                 locals=[],
+                result=None,
                 instructions=[Call(name="$sayNumber", arguments=[])],
             ),
         ],
@@ -191,6 +198,7 @@ def test_function_call_with_arguments():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -199,6 +207,7 @@ def test_function_call_with_arguments():
                 params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
                 locals=[],
                 result=Result(type="i32"),
+                export=None,
                 instructions=[
                     BinaryOperation(
                         op="i32.add",
@@ -212,6 +221,7 @@ def test_function_call_with_arguments():
                 export="Main",
                 params=[],
                 locals=[],
+                result=None,
                 instructions=[
                     Call(
                         name="$output_println",
@@ -249,6 +259,7 @@ def test_if_statement():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -257,6 +268,7 @@ def test_if_statement():
                 export="Main",
                 params=[],
                 locals=[],
+                result=None,
                 instructions=[
                     If(
                         condition=BinaryOperation(
@@ -299,6 +311,7 @@ def test_if_else_statement():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -307,6 +320,7 @@ def test_if_else_statement():
                 export="Main",
                 params=[],
                 locals=[],
+                result=None,
                 instructions=[
                     If(
                         condition=BinaryOperation(
@@ -359,6 +373,7 @@ def test_factorial():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -409,6 +424,7 @@ def test_factorial():
                 export="Main",
                 params=[],
                 locals=[],
+                result=None,
                 instructions=[
                     Call(
                         name="$output_println",
@@ -441,7 +457,6 @@ def test_data_vector():
         imports=[
             Import(
                 name="$output_println",
-                export=None,
                 import_=("System::Output", "println"),
                 params=[Param(type="i32", name=None)],
                 result=None,
@@ -451,7 +466,6 @@ def test_data_vector():
             Func(
                 name="$Vector.new",
                 export=None,
-                import_=None,
                 params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
                 result=Result(type="i32"),
                 locals=[],
@@ -486,7 +500,6 @@ def test_data_vector():
             Func(
                 name="$Main",
                 export="Main",
-                import_=None,
                 params=[],
                 result=None,
                 locals=[],
@@ -514,13 +527,13 @@ def test_data_vector_constructor():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
             Func(
                 name="$Vector.new",
                 export=None,
-                import_=None,
                 locals=[],
                 params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
                 result=Result(type="i32"),
@@ -559,7 +572,6 @@ def test_data_vector_constructor():
             Func(
                 name="$Main",
                 export="Main",
-                import_=None,
                 result=None,
                 params=[],
                 locals=[Local(type="i32", name="$vector")],
@@ -602,6 +614,7 @@ def test_data_vector_with_simple_function():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -651,7 +664,7 @@ def test_data_vector_with_simple_function():
                 locals=[],
                 instructions=[Const(type="i32", val="42")],
             ),
-            Func(name="$Main", export="Main", params=[], locals=[], instructions=[]),
+            Func(name="$Main", export="Main", params=[], locals=[], result=None, instructions=[]),
         ],
     )
 
@@ -679,6 +692,7 @@ def test_data_vector_with_simple_function_call():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -733,6 +747,7 @@ def test_data_vector_with_simple_function_call():
                 export="Main",
                 params=[],
                 locals=[Local(type="i32", name="$vector")],
+                result=None,
                 instructions=[
                     SetLocal(
                         name="$vector",
@@ -782,6 +797,7 @@ def test_data_vector_with_self_getter_method():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -849,6 +865,7 @@ def test_data_vector_with_self_getter_method():
                 export="Main",
                 params=[],
                 locals=[Local(name="$vector", type="i32")],
+                result=None,
                 instructions=[
                     SetLocal(
                         name="$vector",
@@ -903,6 +920,7 @@ def test_data_vector_with_self_getter_methods():
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -991,6 +1009,7 @@ def test_data_vector_with_self_getter_methods():
                 export="Main",
                 params=[],
                 locals=[Local(name="$vector", type="i32")],
+                result=None,
                 instructions=[
                     SetLocal(
                         name="$vector",

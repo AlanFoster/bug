@@ -34,15 +34,17 @@ def test_empty_program():
 
     assert result == Program(imports=[], data_defs=[], functions=[])
 
+
 def test_invalid_program():
     source = "export function Main()"
 
     with pytest.raises(BugSyntaxException) as e:
         get_ast(source)
     assert (
-            str(e.value)
-            == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
+        str(e.value)
+        == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
     )
+
 
 def test_simple_expression():
     source = """

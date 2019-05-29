@@ -31,12 +31,16 @@ def test_simple_expression(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
             Func(
                 name="$Main",
                 export="Main",
+                locals=[],
+                params=[],
+                result=None,
                 instructions=[
                     Call(
                         name="$output_println",
@@ -67,6 +71,7 @@ def test_function_call_with_params_and_locals(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -75,6 +80,7 @@ def test_function_call_with_params_and_locals(snapshot):
                 params=[Param(type="i32", name="$a"), Param(type="i32", name="$b")],
                 result=Result("i32"),
                 locals=[Local(type="i32", name="$answer")],
+                export=None,
                 instructions=[
                     SetLocal(
                         name="$answer",
@@ -90,7 +96,9 @@ def test_function_call_with_params_and_locals(snapshot):
             Func(
                 name="$Main",
                 export="Main",
+                params=[],
                 locals=[Local(type="i32", name="$a"), Local(type="i32", name="$b")],
+                result=None,
                 instructions=[
                     SetLocal(name="$a", val=Const(type="i32", val="2")),
                     SetLocal(name="$b", val=Const(type="i32", val="3")),
@@ -118,6 +126,7 @@ def test_conditionals(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -125,6 +134,7 @@ def test_conditionals(snapshot):
                 name="$Foo",
                 result=Result(type="i32"),
                 export=None,
+                params=[],
                 locals=[],
                 instructions=[
                     If(
@@ -157,7 +167,9 @@ def test_conditionals(snapshot):
             Func(
                 name="$Main",
                 export="Main",
+                params=[],
                 locals=[],
+                result=None,
                 instructions=[Call(name="$Foo", arguments=[]), Drop()],
             ),
         ],
@@ -173,6 +185,7 @@ def test_returns(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param("i32")],
+                result=None,
             )
         ],
         instructions=[
@@ -181,6 +194,7 @@ def test_returns(snapshot):
                 result=Result(type="i32"),
                 export=None,
                 locals=[],
+                params=[],
                 instructions=[Return(expression=Const(type="i32", val="42"))],
             ),
             Func(
@@ -188,6 +202,7 @@ def test_returns(snapshot):
                 result=None,
                 export=None,
                 locals=[],
+                params=[],
                 instructions=[
                     Call(name="$meaning_of_life", arguments=[]),
                     Return(expression=Nop()),
@@ -197,6 +212,8 @@ def test_returns(snapshot):
                 name="$Main",
                 export="Main",
                 locals=[],
+                params=[],
+                result=None,
                 instructions=[Call(name="$output_meaning_of_life", arguments=[])],
             ),
         ],
@@ -215,6 +232,7 @@ def test_memory(snapshot):
                 params=[],
                 locals=[],
                 result=None,
+                export=None,
                 instructions=[
                     Store(
                         type="i32",
@@ -240,6 +258,7 @@ def test_globals(snapshot):
                 params=[],
                 locals=[],
                 result=Result(type="i32"),
+                export=None,
                 instructions=[
                     SetGlobal(
                         name="$count",

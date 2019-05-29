@@ -42,6 +42,7 @@ def preamble() -> List[Instruction]:
         params=[Param(type="i32", name="$required_bytes")],
         locals=[],
         result=Result(type="i32"),
+        export=None,
         instructions=[
             GetGlobal(name="$heap_pointer"),
             SetGlobal(

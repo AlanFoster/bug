@@ -50,11 +50,10 @@ class Result:
 
 @dataclass
 class Import(Instruction):
-    name: Optional[str] = None
-    export: Optional[str] = None
-    import_: Optional[Any] = None
-    params: List[Param] = None
-    result: Optional[Result] = None
+    name: Optional[str]
+    import_: Optional[Any]
+    params: List[Param]
+    result: Optional[Result]
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_import(self)
@@ -72,13 +71,12 @@ class Func(Instruction):
     Reference locals with `get_local $p1`, `get_local $a`
     """
 
-    name: Optional[str] = None
-    export: Optional[str] = None
-    import_: Optional[Any] = None
-    params: List[Param] = None
-    result: Optional[Result] = None
-    locals: List[Local] = None
-    instructions: List[Instruction] = None
+    name: Optional[str]
+    export: Optional[str]
+    params: List[Param]
+    locals: List[Local]
+    instructions: List[Instruction]
+    result: Optional[Result]
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_func(self)

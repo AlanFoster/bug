@@ -160,7 +160,6 @@ class AstVisitor(ast.AstVisitor):
             params=params,
             result=Result(type=function.result) if function.result else None,
             locals=locals_,
-            import_=None,
             instructions=body,
         )
 
@@ -257,7 +256,6 @@ class AstVisitor(ast.AstVisitor):
         constructor = Func(
             name=f"${data.name}.new",
             export=None,
-            import_=None,
             params=params,
             result=Result(type="i32"),
             locals=[],
