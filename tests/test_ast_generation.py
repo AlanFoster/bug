@@ -1,4 +1,6 @@
 import antlr4
+import pytest
+
 from compiler.ast import (
     Program,
     If,
@@ -17,6 +19,7 @@ from compiler.ast import (
     MemberAccess,
 )
 from compiler import compiler
+from compiler.error_listener import BugSyntaxException
 
 
 def get_ast(source: str) -> Program:
@@ -31,6 +34,15 @@ def test_empty_program():
 
     assert result == Program(imports=[], data_defs=[], functions=[])
 
+def test_invalid_program():
+    source = "export function Main()"
+
+    with pytest.raises(BugSyntaxException) as e:
+        get_ast(source)
+    assert (
+            str(e.value)
+            == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
+    )
 
 def test_simple_expression():
     source = """
@@ -399,7 +411,7 @@ def test_data_vector():
     source = """
         import System::Output;
 
-        export data Vector(x: i32, y: i32);
+        export data Vector(x: i32, y: i32)
 
         export function Main(): void {
 

@@ -7,12 +7,15 @@ from parser.BugLexer import BugLexer
 from parser.BugParser import BugParser
 from wasm.model import Module
 from .parse_tree_visitor import ParseTreeVisitor
+from .error_listener import ErrorListener
 
 
 def get_parse_tree(input_stream: antlr4.InputStream):
     lexer = BugLexer(input_stream)
     tokens = antlr4.CommonTokenStream(lexer)
     parser = BugParser(tokens)
+    parser.removeErrorListeners()
+    parser.addErrorListener(ErrorListener())
     tree = parser.program()
     return tree
 

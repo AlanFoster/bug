@@ -881,11 +881,11 @@ def test_data_vector_with_self_getter_methods():
 
         export data Vector(x: i32, y: i32) {
             function getX(self: Vector): i32 {
-                self.x
+                self.x;
             }
 
             function getY(self: Vector): i32 {
-                self.y
+                self.y;
             }
         }
 
