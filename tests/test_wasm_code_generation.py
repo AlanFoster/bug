@@ -349,7 +349,6 @@ def test_if_else_statement():
 
 
 def test_factorial():
-    # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
     source = """
         import System::Output;
 
@@ -1053,13 +1052,12 @@ def test_data_vector_with_self_getter_methods():
 
 
 def test_data_vector_with_math():
-    # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
     source = """
         import System::Output;
 
         export data Vector(x: i32, y: i32) {
             function getDoubleY(self: Vector): i32 {
-                (self.y) + (self.y);
+                self.y + self.y;
             }
         }
 

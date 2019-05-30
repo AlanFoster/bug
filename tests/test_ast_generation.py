@@ -326,7 +326,6 @@ def test_if_else_statement():
 
 
 def test_factorial():
-    # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
     source = """
         import System::Output;
 
@@ -334,7 +333,7 @@ def test_factorial():
             if (n == 1) {
                 return 1;
             } else {
-                return n * (factorial(n=n-1));
+                return n * factorial(n=n-1);
             }
         }
 
@@ -545,13 +544,12 @@ def test_data_vector_with_simple_function_call():
 
 
 def test_data_vector_with_complex_function():
-    # TODO: The precedence in this example is wrong. Additional parentheses provided for now.
     source = """
         import System::Output;
 
         export data Vector(x: i32, y: i32) {
             function add(self: Vector, other: Vector): Vector {
-                Vector(x = (self.x) + (other.x), y = (self.y) + (other.y));
+                Vector(x = self.x + other.x, y = self.y + other.y);
             }
         }
 

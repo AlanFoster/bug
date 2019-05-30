@@ -91,26 +91,26 @@ def serializedATN():
         buf.write("\5(\25\2\u00c2\u00c3\7\33\2\2\u00c3\u00c4\5\66\34\2\u00c4")
         buf.write("%\3\2\2\2\u00c5\u00c6\7)\2\2\u00c6\'\3\2\2\2\u00c7\u00c8")
         buf.write("\7)\2\2\u00c8)\3\2\2\2\u00c9\u00ca\b\26\1\2\u00ca\u00cb")
-        buf.write("\t\2\2\2\u00cb\u00d3\5*\26\16\u00cc\u00d3\5(\25\2\u00cd")
+        buf.write("\t\2\2\2\u00cb\u00d3\5*\26\f\u00cc\u00d3\5(\25\2\u00cd")
         buf.write("\u00d3\5,\27\2\u00ce\u00cf\7\23\2\2\u00cf\u00d0\5*\26")
         buf.write("\2\u00d0\u00d1\7\24\2\2\u00d1\u00d3\3\2\2\2\u00d2\u00c9")
         buf.write("\3\2\2\2\u00d2\u00cc\3\2\2\2\u00d2\u00cd\3\2\2\2\u00d2")
-        buf.write("\u00ce\3\2\2\2\u00d3\u00f1\3\2\2\2\u00d4\u00d5\f\r\2\2")
-        buf.write("\u00d5\u00d6\t\3\2\2\u00d6\u00f0\5*\26\16\u00d7\u00d8")
-        buf.write("\f\f\2\2\u00d8\u00d9\t\4\2\2\u00d9\u00f0\5*\26\r\u00da")
-        buf.write("\u00db\f\13\2\2\u00db\u00dc\t\5\2\2\u00dc\u00f0\5*\26")
-        buf.write("\f\u00dd\u00de\f\n\2\2\u00de\u00df\7!\2\2\u00df\u00f0")
-        buf.write("\5*\26\13\u00e0\u00e1\f\t\2\2\u00e1\u00e2\7\"\2\2\u00e2")
-        buf.write("\u00f0\5*\26\n\u00e3\u00e4\f\b\2\2\u00e4\u00e5\7%\2\2")
-        buf.write("\u00e5\u00f0\5*\26\t\u00e6\u00e7\f\7\2\2\u00e7\u00e8\7")
-        buf.write("\27\2\2\u00e8\u00f0\5(\25\2\u00e9\u00ea\f\4\2\2\u00ea")
-        buf.write("\u00ec\7\23\2\2\u00eb\u00ed\5\62\32\2\u00ec\u00eb\3\2")
-        buf.write("\2\2\u00ec\u00ed\3\2\2\2\u00ed\u00ee\3\2\2\2\u00ee\u00f0")
-        buf.write("\7\24\2\2\u00ef\u00d4\3\2\2\2\u00ef\u00d7\3\2\2\2\u00ef")
-        buf.write("\u00da\3\2\2\2\u00ef\u00dd\3\2\2\2\u00ef\u00e0\3\2\2\2")
-        buf.write("\u00ef\u00e3\3\2\2\2\u00ef\u00e6\3\2\2\2\u00ef\u00e9\3")
-        buf.write("\2\2\2\u00f0\u00f3\3\2\2\2\u00f1\u00ef\3\2\2\2\u00f1\u00f2")
-        buf.write("\3\2\2\2\u00f2+\3\2\2\2\u00f3\u00f1\3\2\2\2\u00f4\u00f7")
+        buf.write("\u00ce\3\2\2\2\u00d3\u00f1\3\2\2\2\u00d4\u00d5\f\13\2")
+        buf.write("\2\u00d5\u00d6\t\3\2\2\u00d6\u00f0\5*\26\f\u00d7\u00d8")
+        buf.write("\f\n\2\2\u00d8\u00d9\t\4\2\2\u00d9\u00f0\5*\26\13\u00da")
+        buf.write("\u00db\f\t\2\2\u00db\u00dc\t\5\2\2\u00dc\u00f0\5*\26\n")
+        buf.write("\u00dd\u00de\f\b\2\2\u00de\u00df\7!\2\2\u00df\u00f0\5")
+        buf.write("*\26\t\u00e0\u00e1\f\7\2\2\u00e1\u00e2\7\"\2\2\u00e2\u00f0")
+        buf.write("\5*\26\b\u00e3\u00e4\f\6\2\2\u00e4\u00e5\7%\2\2\u00e5")
+        buf.write("\u00f0\5*\26\7\u00e6\u00e7\f\16\2\2\u00e7\u00e8\7\27\2")
+        buf.write("\2\u00e8\u00f0\5(\25\2\u00e9\u00ea\f\r\2\2\u00ea\u00ec")
+        buf.write("\7\23\2\2\u00eb\u00ed\5\62\32\2\u00ec\u00eb\3\2\2\2\u00ec")
+        buf.write("\u00ed\3\2\2\2\u00ed\u00ee\3\2\2\2\u00ee\u00f0\7\24\2")
+        buf.write("\2\u00ef\u00d4\3\2\2\2\u00ef\u00d7\3\2\2\2\u00ef\u00da")
+        buf.write("\3\2\2\2\u00ef\u00dd\3\2\2\2\u00ef\u00e0\3\2\2\2\u00ef")
+        buf.write("\u00e3\3\2\2\2\u00ef\u00e6\3\2\2\2\u00ef\u00e9\3\2\2\2")
+        buf.write("\u00f0\u00f3\3\2\2\2\u00f1\u00ef\3\2\2\2\u00f1\u00f2\3")
+        buf.write("\2\2\2\u00f2+\3\2\2\2\u00f3\u00f1\3\2\2\2\u00f4\u00f7")
         buf.write("\7(\2\2\u00f5\u00f7\5.\30\2\u00f6\u00f4\3\2\2\2\u00f6")
         buf.write("\u00f5\3\2\2\2\u00f7-\3\2\2\2\u00f8\u00fc\7*\2\2\u00f9")
         buf.write("\u00fb\5\60\31\2\u00fa\u00f9\3\2\2\2\u00fb\u00fe\3\2\2")
@@ -1949,7 +1949,7 @@ class BugParser ( Parser ):
                     self._errHandler.reportMatch(self)
                     self.consume()
                 self.state = 201
-                self.expression(12)
+                self.expression(10)
                 pass
             elif token in [BugParser.IDENTIFIER]:
                 localctx = BugParser.VariableNameExpressionContext(self, localctx)
@@ -1996,9 +1996,9 @@ class BugParser ( Parser ):
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 210
-                        if not self.precpred(self._ctx, 11):
+                        if not self.precpred(self._ctx, 9):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 11)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 9)")
                         self.state = 211
                         localctx.operator = self._input.LT(1)
                         _la = self._input.LA(1)
@@ -2008,7 +2008,7 @@ class BugParser ( Parser ):
                             self._errHandler.reportMatch(self)
                             self.consume()
                         self.state = 212
-                        localctx.right = self.expression(12)
+                        localctx.right = self.expression(10)
                         pass
 
                     elif la_ == 2:
@@ -2016,9 +2016,9 @@ class BugParser ( Parser ):
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 213
-                        if not self.precpred(self._ctx, 10):
+                        if not self.precpred(self._ctx, 8):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 10)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 8)")
                         self.state = 214
                         localctx.operator = self._input.LT(1)
                         _la = self._input.LA(1)
@@ -2028,7 +2028,7 @@ class BugParser ( Parser ):
                             self._errHandler.reportMatch(self)
                             self.consume()
                         self.state = 215
-                        localctx.right = self.expression(11)
+                        localctx.right = self.expression(9)
                         pass
 
                     elif la_ == 3:
@@ -2036,9 +2036,9 @@ class BugParser ( Parser ):
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 216
-                        if not self.precpred(self._ctx, 9):
+                        if not self.precpred(self._ctx, 7):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 9)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
                         self.state = 217
                         localctx.operator = self._input.LT(1)
                         _la = self._input.LA(1)
@@ -2048,7 +2048,7 @@ class BugParser ( Parser ):
                             self._errHandler.reportMatch(self)
                             self.consume()
                         self.state = 218
-                        localctx.right = self.expression(10)
+                        localctx.right = self.expression(8)
                         pass
 
                     elif la_ == 4:
@@ -2056,13 +2056,13 @@ class BugParser ( Parser ):
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 219
-                        if not self.precpred(self._ctx, 8):
+                        if not self.precpred(self._ctx, 6):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 8)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
                         self.state = 220
                         localctx.operator = self.match(BugParser.AND)
                         self.state = 221
-                        localctx.right = self.expression(9)
+                        localctx.right = self.expression(7)
                         pass
 
                     elif la_ == 5:
@@ -2070,13 +2070,13 @@ class BugParser ( Parser ):
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 222
-                        if not self.precpred(self._ctx, 7):
+                        if not self.precpred(self._ctx, 5):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 7)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
                         self.state = 223
                         localctx.operator = self.match(BugParser.OR)
                         self.state = 224
-                        localctx.right = self.expression(8)
+                        localctx.right = self.expression(6)
                         pass
 
                     elif la_ == 6:
@@ -2084,22 +2084,22 @@ class BugParser ( Parser ):
                         localctx.left = _prevctx
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 225
-                        if not self.precpred(self._ctx, 6):
+                        if not self.precpred(self._ctx, 4):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 4)")
                         self.state = 226
                         localctx.operator = self.match(BugParser.EQEQ)
                         self.state = 227
-                        localctx.right = self.expression(7)
+                        localctx.right = self.expression(5)
                         pass
 
                     elif la_ == 7:
                         localctx = BugParser.MemberDotExpressionContext(self, BugParser.ExpressionContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 228
-                        if not self.precpred(self._ctx, 5):
+                        if not self.precpred(self._ctx, 12):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 12)")
                         self.state = 229
                         self.match(BugParser.DOT)
                         self.state = 230
@@ -2110,9 +2110,9 @@ class BugParser ( Parser ):
                         localctx = BugParser.CallExpressionContext(self, BugParser.ExpressionContext(self, _parentctx, _parentState))
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_expression)
                         self.state = 231
-                        if not self.precpred(self._ctx, 2):
+                        if not self.precpred(self._ctx, 11):
                             from antlr4.error.Errors import FailedPredicateException
-                            raise FailedPredicateException(self, "self.precpred(self._ctx, 2)")
+                            raise FailedPredicateException(self, "self.precpred(self._ctx, 11)")
                         self.state = 232
                         self.match(BugParser.LPAREN)
                         self.state = 234
@@ -2547,35 +2547,35 @@ class BugParser ( Parser ):
 
     def expression_sempred(self, localctx:ExpressionContext, predIndex:int):
             if predIndex == 0:
-                return self.precpred(self._ctx, 11)
-         
-
-            if predIndex == 1:
-                return self.precpred(self._ctx, 10)
-         
-
-            if predIndex == 2:
                 return self.precpred(self._ctx, 9)
          
 
-            if predIndex == 3:
+            if predIndex == 1:
                 return self.precpred(self._ctx, 8)
          
 
-            if predIndex == 4:
+            if predIndex == 2:
                 return self.precpred(self._ctx, 7)
          
 
-            if predIndex == 5:
+            if predIndex == 3:
                 return self.precpred(self._ctx, 6)
          
 
-            if predIndex == 6:
+            if predIndex == 4:
                 return self.precpred(self._ctx, 5)
          
 
+            if predIndex == 5:
+                return self.precpred(self._ctx, 4)
+         
+
+            if predIndex == 6:
+                return self.precpred(self._ctx, 12)
+         
+
             if predIndex == 7:
-                return self.precpred(self._ctx, 2)
+                return self.precpred(self._ctx, 11)
          
 
 

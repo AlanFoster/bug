@@ -59,17 +59,17 @@ functionName: IDENTIFIER ;
 variableName: IDENTIFIER ;
 
 expression:
-    operator=(SUB | NOT) expression                         # unaryExpression
+    expression '.' variableName                             # memberDotExpression
+    | expression '(' argumentList? ')'                      # callExpression
+    | operator=(SUB | NOT) expression                       # unaryExpression
     | left=expression operator=(MUL | DIV) right=expression # binaryExpression
     | left=expression operator=(ADD | SUB) right=expression # binaryExpression
     | left=expression operator=(LT | GT) right=expression   # binaryExpression
     | left=expression operator=AND right=expression         # binaryExpression
     | left=expression operator=OR right=expression          # binaryExpression
     | left=expression operator=EQEQ right=expression        # binaryExpression
-    | expression '.' variableName                           # memberDotExpression
     | variableName                                          # variableNameExpression
     | literal                                               # literalExpression
-    | expression '(' argumentList? ')'                      # callExpression
     | '(' expression ')'                                    # nestedExpression
     ;
 
