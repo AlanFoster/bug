@@ -1,6 +1,3 @@
-from typing import Optional
-
-from compiler.ast import MemberAccess
 from .symbol_table import EmptySymbolTable, Symbol, SymbolType
 import compiler.ast as ast
 from wasm.model import (
@@ -78,7 +75,7 @@ class AstVisitor(ast.AstVisitor):
     def visit_let(self, let: ast.Let):
         expression = let.value.accept(self)
         # TODO: ast.Assignments should infer the expression type / support explicit types: ast.`let a: ast.i32 = expression;`
-        type_ = "Vector" if let.name == "vector" else "i32"
+        type_ = "Vector" if let.name.startswith("vector") else "i32"
         symbol = Symbol(name=let.name, type=type_, kind=SymbolType.LOCAL)
         self.symbol_table.add(symbol)
 
@@ -148,7 +145,7 @@ class AstVisitor(ast.AstVisitor):
         locals_ = []
         for symbol in self.symbol_table.locals():
             # TODO: This should correctly understand that class types will be pointers, i.e. i32
-            type_ = "i32" if symbol.name == "vector" else symbol.type
+            type_ = "i32" if symbol.name.startswith("vector") else symbol.type
             locals_.append(Local(type=type_, name=symbol.generated_name))
         self.symbol_table = self.symbol_table.exit_scope()
 
@@ -158,7 +155,14 @@ class AstVisitor(ast.AstVisitor):
             # Note: ast.The export name is the original function name
             export=function.name if function.is_exported else None,
             params=params,
-            result=Result(type=function.result) if function.result else None,
+            result=Result(
+                # TODO: Decide when pointers are returned from function results correctly
+                type="i32"
+                if function.result == "Vector"
+                else function.result
+            )
+            if function.result
+            else None,
             locals=locals_,
             instructions=body,
         )
@@ -284,11 +288,11 @@ class AstVisitor(ast.AstVisitor):
         return [constructor] + data_funcs
 
     # TODO: Only works within self
-    def visit_member_access(self, member: MemberAccess):
-        target = member.value.name
-        if target != "self":
-            raise ValueError(f"No support added for {member} yet.")
+    def visit_member_access(self, member: ast.MemberAccess):
+        if not isinstance(member.value, ast.Variable):
+            raise TypeError(f"No support added for {member} yet.")
 
+        target = member.value.name
         target_symbol = self.symbol_table.get(target)
         field_symbol = self.symbol_table.get(member.member)
 
