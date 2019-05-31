@@ -24,9 +24,9 @@ snapshots['test_preamble 1'] = '''(module
             (i32.add
                 (i32.mul
                     (i32.const 4)
-                    (global.get $heap_pointer)
+                    (get_local $required_bytes)
                 )
-                (get_local $required_bytes)
+                (global.get $heap_pointer)
             )
         )
     )

@@ -54,10 +54,10 @@ def preamble() -> List[Instruction]:
                             BinaryOperation(
                                 op="i32.mul",
                                 left=(Const(type="i32", val="4")),
-                                right=GetGlobal(name="$heap_pointer"),
+                                right=GetLocal(name="$required_bytes"),
                             )
                         ),
-                        right=GetLocal(name="$required_bytes"),
+                        right=GetGlobal(name="$heap_pointer"),
                     )
                 ),
             ),
