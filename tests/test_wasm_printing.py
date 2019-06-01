@@ -1,3 +1,4 @@
+from tests.helpers.wasm import assert_valid_wat
 from wasm.model import (
     Module,
     Import,
@@ -60,8 +61,9 @@ def test_simple_expression(snapshot):
             )
         ],
     )
-    wasm_result = pretty_print(source)
-    snapshot.assert_match(wasm_result)
+    result = pretty_print(source)
+    assert_valid_wat(result)
+    snapshot.assert_match(result)
 
 
 def test_function_call_with_params_and_locals(snapshot):
@@ -115,8 +117,9 @@ def test_function_call_with_params_and_locals(snapshot):
             ),
         ],
     )
-    wasm_result = pretty_print(source)
-    snapshot.assert_match(wasm_result)
+    result = pretty_print(source)
+    assert_valid_wat(result)
+    snapshot.assert_match(result)
 
 
 def test_conditionals(snapshot):
@@ -174,8 +177,9 @@ def test_conditionals(snapshot):
             ),
         ],
     )
-    wasm_result = pretty_print(source)
-    snapshot.assert_match(wasm_result)
+    result = pretty_print(source)
+    assert_valid_wat(result)
+    snapshot.assert_match(result)
 
 
 def test_returns(snapshot):
@@ -218,8 +222,9 @@ def test_returns(snapshot):
             ),
         ],
     )
-    wasm_result = pretty_print(source)
-    snapshot.assert_match(wasm_result)
+    result = pretty_print(source)
+    assert_valid_wat(result)
+    snapshot.assert_match(result)
 
 
 def test_memory(snapshot):
@@ -231,7 +236,7 @@ def test_memory(snapshot):
                 name="$set_memory",
                 params=[],
                 locals=[],
-                result=None,
+                result=Result(type="i32"),
                 export=None,
                 instructions=[
                     Store(
@@ -244,8 +249,9 @@ def test_memory(snapshot):
             ),
         ],
     )
-    wasm_result = pretty_print(source)
-    snapshot.assert_match(wasm_result)
+    result = pretty_print(source)
+    assert_valid_wat(result)
+    snapshot.assert_match(result)
 
 
 def test_globals(snapshot):
@@ -276,5 +282,6 @@ def test_globals(snapshot):
         ],
     )
 
-    wasm_result = pretty_print(source)
-    snapshot.assert_match(wasm_result)
+    result = pretty_print(source)
+    assert_valid_wat(result)
+    snapshot.assert_match(result)

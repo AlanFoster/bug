@@ -142,7 +142,7 @@ snapshots['test_returns 1'] = '''(module
 snapshots['test_memory 1'] = '''(module
     (memory (export "memory") 1)
 
-    (func $set_memory
+    (func $set_memory (result i32)
         (i32.store
             (i32.const 0)
             (i32.const 1337)
