@@ -117,16 +117,10 @@ class AstVisitor(ast.AstVisitor):
         return Call(name=function_name, arguments=arguments)
 
     def visit_function(self, function: ast.Function):
-        # Data definitions can have associated functions, in this case they will be compiled as:
-        # `Vector.foo`, otherwise the normal function name will be used `foo`
-        function_name = (
-            f"{self.data_name}.{function.name}" if self.data_name else function.name
-        )
-
         # Place the current function into the symbol table so that it can be called by
         # other functions later, or recursively if required.
         function_symbol = Symbol(
-            name=function_name, type=function.result, kind=SymbolType.FUNC
+            name=function.name, type=function.result, kind=SymbolType.FUNC
         )
         self.symbol_table.add(function_symbol)
         self.symbol_table = self.symbol_table.enter_scope()
@@ -150,8 +144,10 @@ class AstVisitor(ast.AstVisitor):
         self.symbol_table = self.symbol_table.exit_scope()
 
         return Func(
-            # Note: ast.The function name is the internally generated name for this module
-            name=function_symbol.generated_name,
+            # Note: The function name is the internally generated name for this module
+            # Data definitions can have associated functions, in this case they will be compiled as:
+            # `Vector.foo`, otherwise the normal function name will be used `foo`
+            name=f"${self.data_name}.{function.name}" if self.data_name else f"${function.name}",
             # Note: ast.The export name is the original function name
             export=function.name if function.is_exported else None,
             params=params,
