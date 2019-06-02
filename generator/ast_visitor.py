@@ -1,4 +1,4 @@
-from .symbol_table import EmptySymbolTable, Symbol, SymbolType
+from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolType
 import compiler.ast as ast
 from wasm.model import (
     Module,

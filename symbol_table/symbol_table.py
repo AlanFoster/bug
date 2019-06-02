@@ -68,7 +68,6 @@ class EmptySymbolTable(SymbolTable):
     def tree(self, depth: int = 0) -> str:
         return "[Empty]"
 
-
 @dataclass
 class ChildSymbolTable(SymbolTable):
     parent: Optional[SymbolTable]
