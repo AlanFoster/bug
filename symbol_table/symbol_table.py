@@ -3,8 +3,10 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, Optional
 
+from symbol_table.type import Type
 
-class SymbolType(Enum):
+
+class SymbolKind(Enum):
     LOCAL = 1
     PARAM = 2
     FUNC = 3
@@ -15,13 +17,13 @@ class SymbolType(Enum):
 @dataclass
 class Symbol:
     name: str
-    type: str
-    kind: SymbolType
+    type: Type
+    kind: SymbolKind
     field_number: Optional[int] = None
 
     @property
     def generated_name(self):
-        if self.kind is SymbolType.DATA:
+        if self.kind is SymbolKind.DATA:
             return f"${self.name}.new"
 
         return f"${self.name}"
@@ -34,6 +36,10 @@ class SymbolTable:
 
     @abstractmethod
     def get(self, name: str) -> Symbol:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def has(self, name: str) -> bool:
         raise NotImplementedError()
 
     @abstractmethod
@@ -53,10 +59,10 @@ class EmptySymbolTable(SymbolTable):
     def add(self, symbol: Symbol):
         raise NotImplementedError()
 
-    def get(self, name) -> Symbol:
+    def get(self, name: str) -> Symbol:
         raise ValueError(f"Missing variable '{name}'.")
 
-    def has(self, name) -> bool:
+    def has(self, name: str) -> bool:
         return False
 
     def enter_scope(self) -> SymbolTable:
@@ -67,6 +73,7 @@ class EmptySymbolTable(SymbolTable):
 
     def tree(self, depth: int = 0) -> str:
         return "[Empty]"
+
 
 @dataclass
 class ChildSymbolTable(SymbolTable):
@@ -97,7 +104,7 @@ class ChildSymbolTable(SymbolTable):
         return self.parent
 
     def locals(self):
-        return [v for k, v in self.symbols.items() if v.kind is SymbolType.LOCAL]
+        return [v for k, v in self.symbols.items() if v.kind is SymbolKind.LOCAL]
 
     def tree(self, depth: int = 0) -> str:
         symbols = ", ".join(

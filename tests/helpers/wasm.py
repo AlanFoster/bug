@@ -30,5 +30,10 @@ def assert_valid_module(module: Module):
 
 
 def assert_equal_modules(expected: Module, actual: Module):
-    assert expected == actual
+    assert pretty_print(expected) == pretty_print(
+        actual
+    ), "The given module instances do not pretty print to the same string"
+    assert (
+        expected == actual
+    ), "The given module instances pretty print to the same value, but object equality differs"
     assert_valid_module(with_preamble(actual))

@@ -1,5 +1,6 @@
-from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolType
+from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolKind, SymbolTable
 import compiler.ast as ast
+from symbol_table.type import Data, Type, I32
 from wasm.model import (
     Module,
     Func,
@@ -39,6 +40,35 @@ def get_binary_operator(operator):
         raise NotImplementedError(f"Binary operator '{operator}' not implemented.")
 
 
+# TODO: Add language support for type inference
+def infer_type(variable_name: str) -> Type:
+    if variable_name.startswith("vector"):
+        return Data(name="Vector")
+    else:
+        return I32()
+
+
+def as_language_type(type_: str, symbol_table: SymbolTable) -> Type:
+    if type_ == "i32":
+        return I32()
+    if symbol_table.has(type_):
+        return symbol_table.get(type_).type
+    else:
+        raise NotImplementedError()
+
+
+def as_wasm_type(type_: Type) -> str:
+    if type_.is_data():
+        # If the required language type is data, then we require a i32 pointer
+        return "i32"
+    elif type_.is_i32():
+        return "i32"
+    elif type_.is_void():
+        raise NotImplementedError()
+    else:
+        raise NotImplementedError()
+
+
 class AstVisitor(ast.AstVisitor):
     def __init__(self):
         self.symbol_table: EmptySymbolTable = EmptySymbolTable()
@@ -74,9 +104,7 @@ class AstVisitor(ast.AstVisitor):
 
     def visit_let(self, let: ast.Let):
         expression = let.value.accept(self)
-        # TODO: ast.Assignments should infer the expression type / support explicit types: ast.`let a: ast.i32 = expression;`
-        type_ = "Vector" if let.name.startswith("vector") else "i32"
-        symbol = Symbol(name=let.name, type=type_, kind=SymbolType.LOCAL)
+        symbol = Symbol(name=let.name, type=infer_type(let.name), kind=SymbolKind.LOCAL)
         self.symbol_table.add(symbol)
 
         return SetLocal(name=symbol.generated_name, val=expression)
@@ -92,7 +120,7 @@ class AstVisitor(ast.AstVisitor):
             function_name = "$output_println"
         elif self.symbol_table.has(function_call.name):
             symbol = self.symbol_table.get(function_call.name)
-            if symbol.kind not in (SymbolType.FUNC, SymbolType.DATA):
+            if symbol.kind not in (SymbolKind.FUNC, SymbolKind.DATA):
                 raise NotImplementedError(
                     f"{function_call.name} is not a function or data"
                 )
@@ -103,7 +131,10 @@ class AstVisitor(ast.AstVisitor):
             # implemented with Call containing an expression in the future
             target, method = function_call.name.split(".")
             target_symbol = self.symbol_table.get(target)
-            function_name = f"${target_symbol.type}.{method}"
+            if target_symbol.type.is_data():
+                function_name = f"${target_symbol.type.name}.{method}"
+            else:
+                raise NotImplementedError()
         else:
             raise NotImplementedError(f"{function_call.name} not supported")
         arguments = []
@@ -120,7 +151,7 @@ class AstVisitor(ast.AstVisitor):
         # Place the current function into the symbol table so that it can be called by
         # other functions later, or recursively if required.
         function_symbol = Symbol(
-            name=function.name, type=function.result, kind=SymbolType.FUNC
+            name=function.name, type=function.result, kind=SymbolKind.FUNC
         )
         self.symbol_table.add(function_symbol)
         self.symbol_table = self.symbol_table.enter_scope()
@@ -128,7 +159,11 @@ class AstVisitor(ast.AstVisitor):
         # Populate the required params into the symbol table before compiling the function body
         params = []
         for param in function.params:
-            symbol = Symbol(name=param.name, type=param.type, kind=SymbolType.PARAM)
+            symbol = Symbol(
+                name=param.name,
+                type=as_language_type(param.type, self.symbol_table),
+                kind=SymbolKind.PARAM,
+            )
             self.symbol_table.add(symbol)
             params.append(Param(type="i32", name=symbol.generated_name))
         body = []
@@ -138,24 +173,25 @@ class AstVisitor(ast.AstVisitor):
         # After visiting the function body, any local variables will now be in the symbol table
         locals_ = []
         for symbol in self.symbol_table.locals():
-            # TODO: This should correctly understand that class types will be pointers, i.e. i32
-            type_ = "i32" if symbol.name.startswith("vector") else symbol.type
-            locals_.append(Local(type=type_, name=symbol.generated_name))
+            locals_.append(
+                Local(type=as_wasm_type(symbol.type), name=symbol.generated_name)
+            )
         self.symbol_table = self.symbol_table.exit_scope()
 
         return Func(
             # Note: The function name is the internally generated name for this module
             # Data definitions can have associated functions, in this case they will be compiled as:
             # `Vector.foo`, otherwise the normal function name will be used `foo`
-            name=f"${self.data_name}.{function.name}" if self.data_name else f"${function.name}",
+            name=(
+                f"${self.data_name}.{function.name}"
+                if self.data_name
+                else f"${function.name}"
+            ),
             # Note: ast.The export name is the original function name
             export=function.name if function.is_exported else None,
             params=params,
             result=Result(
-                # TODO: Decide when pointers are returned from function results correctly
-                type="i32"
-                if function.result == "Vector"
-                else function.result
+                as_wasm_type(as_language_type(function.result, self.symbol_table))
             )
             if function.result
             else None,
@@ -216,7 +252,7 @@ class AstVisitor(ast.AstVisitor):
 
         # Update the current symbol table with the current data class details
         self.symbol_table.add(
-            Symbol(name=data.name, type=data.name, kind=SymbolType.DATA)
+            Symbol(name=data.name, type=Data(name=data.name), kind=SymbolKind.DATA)
         )
 
         # Specify all known functions
@@ -269,8 +305,8 @@ class AstVisitor(ast.AstVisitor):
             self.symbol_table.add(
                 Symbol(
                     name=param.name,
-                    type=param.type,
-                    kind=SymbolType.DATA_FIELD,
+                    type=as_language_type(param.type, self.symbol_table),
+                    kind=SymbolKind.DATA_FIELD,
                     field_number=index,
                 )
             )

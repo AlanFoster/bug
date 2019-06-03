@@ -27,6 +27,7 @@ class BinaryOperator(Enum):
     EQUALS = 5
     SUBTRACT = 6
 
+
 @dataclass
 class BinaryOperation(Node):
     operator: BinaryOperator
