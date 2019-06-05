@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, Optional
 
-from symbol_table.type import Type
+from symbol_table.types import Type
 
 
 class SymbolKind(Enum):

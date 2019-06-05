@@ -2,7 +2,9 @@ import subprocess
 import tempfile
 
 import pytest
+from prettyprinter import pformat
 
+from compiler.ast import Program
 from wasm.model import Module
 from wasm.printer import pretty_print
 from generator.preamble import with_preamble
@@ -29,11 +31,20 @@ def assert_valid_module(module: Module):
     assert_valid_wat(wat)
 
 
-def assert_equal_modules(expected: Module, actual: Module):
-    assert pretty_print(expected) == pretty_print(
-        actual
+def assert_equal_modules(actual: Module, expected: Module):
+    assert pretty_print(actual) == pretty_print(
+        expected
     ), "The given module instances do not pretty print to the same string"
     assert (
-        expected == actual
+        actual == expected
     ), "The given module instances pretty print to the same value, but object equality differs"
     assert_valid_module(with_preamble(actual))
+
+
+def assert_equal_programs(actual: Program, expected: Program):
+    assert pformat(actual) == pformat(
+        expected
+    ), "The given program instances do not pretty print to the same string"
+    assert (
+        actual == expected
+    ), "The given program instances pretty print to the same value, but object equality differs"

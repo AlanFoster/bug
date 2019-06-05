@@ -20,6 +20,8 @@ from compiler.ast import (
 )
 from compiler import compiler
 from compiler.error_listener import BugSyntaxException
+from symbol_table import types
+from tests.helpers.wasm import assert_equal_programs
 
 
 def get_ast(source: str) -> Program:
@@ -32,7 +34,7 @@ def test_empty_program():
     source = ""
     result = get_ast(source)
 
-    assert result == Program(imports=[], data_defs=[], functions=[])
+    assert_equal_programs(result, Program(imports=[], data_defs=[], functions=[]))
 
 
 def test_invalid_program():
@@ -56,36 +58,39 @@ def test_simple_expression():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    FunctionCall(
-                        name="println",
-                        arguments=[
-                            Argument(
-                                name="value",
-                                value=BinaryOperation(
-                                    operator=BinaryOperator.ADD,
-                                    left=Number(value=1),
-                                    right=BinaryOperation(
-                                        operator=BinaryOperator.MULTIPLY,
-                                        left=Number(value=2),
-                                        right=Number(value=3),
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        FunctionCall(
+                            name="println",
+                            arguments=[
+                                Argument(
+                                    name="value",
+                                    value=BinaryOperation(
+                                        operator=BinaryOperator.ADD,
+                                        left=Number(value=1),
+                                        right=BinaryOperation(
+                                            operator=BinaryOperator.MULTIPLY,
+                                            left=Number(value=2),
+                                            right=Number(value=3),
+                                        ),
                                     ),
-                                ),
-                            )
-                        ],
-                    )
-                ],
-            )
-        ],
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ],
+        ),
     )
 
 
@@ -101,34 +106,37 @@ def test_simple_assignment():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    Let(name="a", value=Number(5)),
-                    Let(name="b", value=Number(10)),
-                    FunctionCall(
-                        name="println",
-                        arguments=[
-                            Argument(
-                                name="value",
-                                value=BinaryOperation(
-                                    operator=BinaryOperator.ADD,
-                                    left=Variable(name="a"),
-                                    right=Variable(name="b"),
-                                ),
-                            )
-                        ],
-                    ),
-                ],
-            )
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        Let(name="a", value=Number(5)),
+                        Let(name="b", value=Number(10)),
+                        FunctionCall(
+                            name="println",
+                            arguments=[
+                                Argument(
+                                    name="value",
+                                    value=BinaryOperation(
+                                        operator=BinaryOperator.ADD,
+                                        left=Variable(name="a"),
+                                        right=Variable(name="b"),
+                                    ),
+                                )
+                            ],
+                        ),
+                    ],
+                )
+            ],
+        ),
     )
 
 
@@ -146,30 +154,33 @@ def test_function_call_with_no_arguments():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="sayNumber",
-                is_exported=False,
-                params=[],
-                result=None,
-                body=[
-                    FunctionCall(
-                        name="println",
-                        arguments=[Argument(name="value", value=Number(1337))],
-                    )
-                ],
-            ),
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[FunctionCall(name="sayNumber", arguments=[])],
-            ),
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="sayNumber",
+                    is_exported=False,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        FunctionCall(
+                            name="println",
+                            arguments=[Argument(name="value", value=Number(1337))],
+                        )
+                    ],
+                ),
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[FunctionCall(name="sayNumber", arguments=[])],
+                ),
+            ],
+        ),
     )
 
 
@@ -187,49 +198,59 @@ def test_function_call_with_arguments():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="add",
-                is_exported=False,
-                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
-                result="i32",
-                body=[
-                    BinaryOperation(
-                        operator=BinaryOperator.ADD,
-                        left=Variable("x"),
-                        right=Variable("y"),
-                    )
-                ],
-            ),
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    FunctionCall(
-                        name="println",
-                        arguments=[
-                            Argument(
-                                name="value",
-                                value=(
-                                    FunctionCall(
-                                        name="add",
-                                        arguments=[
-                                            Argument(name="a", value=Number(value=5)),
-                                            Argument(name="b", value=Number(value=15)),
-                                        ],
-                                    )
-                                ),
-                            )
-                        ],
-                    )
-                ],
-            ),
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="add",
+                    is_exported=False,
+                    params=[
+                        Param(name="x", type=types.Placeholder(text="i32")),
+                        Param(name="y", type=types.Placeholder(text="i32")),
+                    ],
+                    type=types.Placeholder(text="i32"),
+                    body=[
+                        BinaryOperation(
+                            operator=BinaryOperator.ADD,
+                            left=Variable("x"),
+                            right=Variable("y"),
+                        )
+                    ],
+                ),
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        FunctionCall(
+                            name="println",
+                            arguments=[
+                                Argument(
+                                    name="value",
+                                    value=(
+                                        FunctionCall(
+                                            name="add",
+                                            arguments=[
+                                                Argument(
+                                                    name="a", value=Number(value=5)
+                                                ),
+                                                Argument(
+                                                    name="b", value=Number(value=15)
+                                                ),
+                                            ],
+                                        )
+                                    ),
+                                )
+                            ],
+                        )
+                    ],
+                ),
+            ],
+        ),
     )
 
 
@@ -245,37 +266,41 @@ def test_if_statement():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    If(
-                        condition=BinaryOperation(
-                            operator=BinaryOperator.GREATER_THAN,
-                            left=Number(5),
-                            right=Number(10),
-                        ),
-                        then_statements=[
-                            FunctionCall(
-                                name="println",
-                                arguments=[Argument(name="value", value=(Number(1)))],
-                            )
-                        ],
-                        else_statements=None,
-                    )
-                ],
-            )
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        If(
+                            condition=BinaryOperation(
+                                operator=BinaryOperator.GREATER_THAN,
+                                left=Number(5),
+                                right=Number(10),
+                            ),
+                            then_statements=[
+                                FunctionCall(
+                                    name="println",
+                                    arguments=[
+                                        Argument(name="value", value=(Number(1)))
+                                    ],
+                                )
+                            ],
+                            else_statements=None,
+                        )
+                    ],
+                )
+            ],
+        ),
     )
 
 
-#
 def test_if_else_statement():
     source = """
         import System::Output;
@@ -289,39 +314,45 @@ def test_if_else_statement():
         }
      """
     result = get_ast(source)
-
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    If(
-                        condition=BinaryOperation(
-                            operator=BinaryOperator.GREATER_THAN,
-                            left=Number(5),
-                            right=Number(10),
-                        ),
-                        then_statements=[
-                            FunctionCall(
-                                name="println",
-                                arguments=[Argument(name="value", value=(Number(1)))],
-                            )
-                        ],
-                        else_statements=[
-                            FunctionCall(
-                                name="println",
-                                arguments=[Argument(name="value", value=(Number(0)))],
-                            )
-                        ],
-                    )
-                ],
-            )
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        If(
+                            condition=BinaryOperation(
+                                operator=BinaryOperator.LESS_THAN,
+                                left=Number(5),
+                                right=Number(10),
+                            ),
+                            then_statements=[
+                                FunctionCall(
+                                    name="println",
+                                    arguments=[
+                                        Argument(name="value", value=(Number(1)))
+                                    ],
+                                )
+                            ],
+                            else_statements=[
+                                FunctionCall(
+                                    name="println",
+                                    arguments=[
+                                        Argument(name="value", value=(Number(0)))
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ],
+        ),
     )
 
 
@@ -343,68 +374,73 @@ def test_factorial():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[],
-        functions=[
-            Function(
-                name="factorial",
-                is_exported=False,
-                params=[Param(name="n", type="i32")],
-                result="i32",
-                body=[
-                    If(
-                        condition=BinaryOperation(
-                            operator=BinaryOperator.EQUALS,
-                            left=Variable("n"),
-                            right=Number(1),
-                        ),
-                        then_statements=[Return(value=Number(value=1))],
-                        else_statements=[
-                            Return(
-                                value=BinaryOperation(
-                                    operator=BinaryOperator.MULTIPLY,
-                                    left=Variable(name="n"),
-                                    right=FunctionCall(
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[],
+            functions=[
+                Function(
+                    name="factorial",
+                    is_exported=False,
+                    params=[Param(name="n", type=types.Placeholder(text="i32"))],
+                    type=types.Placeholder(text="i32"),
+                    body=[
+                        If(
+                            condition=BinaryOperation(
+                                operator=BinaryOperator.EQUALS,
+                                left=Variable("n"),
+                                right=Number(1),
+                            ),
+                            then_statements=[Return(value=Number(value=1))],
+                            else_statements=[
+                                Return(
+                                    value=BinaryOperation(
+                                        operator=BinaryOperator.MULTIPLY,
+                                        left=Variable(name="n"),
+                                        right=FunctionCall(
+                                            name="factorial",
+                                            arguments=[
+                                                Argument(
+                                                    name="n",
+                                                    value=BinaryOperation(
+                                                        operator=BinaryOperator.SUBTRACT,
+                                                        left=Variable(name="n"),
+                                                        right=Number(value=1),
+                                                    ),
+                                                )
+                                            ],
+                                        ),
+                                    )
+                                )
+                            ],
+                        )
+                    ],
+                ),
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        FunctionCall(
+                            name="println",
+                            arguments=[
+                                Argument(
+                                    name="value",
+                                    value=FunctionCall(
                                         name="factorial",
                                         arguments=[
-                                            Argument(
-                                                name="n",
-                                                value=BinaryOperation(
-                                                    operator=BinaryOperator.SUBTRACT,
-                                                    left=Variable(name="n"),
-                                                    right=Number(value=1),
-                                                ),
-                                            )
+                                            Argument(name="n", value=(Number(5)))
                                         ],
                                     ),
                                 )
-                            )
-                        ],
-                    )
-                ],
-            ),
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    FunctionCall(
-                        name="println",
-                        arguments=[
-                            Argument(
-                                name="value",
-                                value=FunctionCall(
-                                    name="factorial",
-                                    arguments=[Argument(name="n", value=(Number(5)))],
-                                ),
-                            )
-                        ],
-                    )
-                ],
-            ),
-        ],
+                            ],
+                        )
+                    ],
+                ),
+            ],
+        ),
     )
 
 
@@ -420,19 +456,32 @@ def test_data_vector():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[
-            DataDef(
-                name="Vector",
-                is_exported=True,
-                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
-                functions=[],
-            )
-        ],
-        functions=[
-            Function(name="Main", is_exported=True, params=[], result=None, body=[])
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[
+                DataDef(
+                    name="Vector",
+                    type=types.Placeholder(text="Vector"),
+                    is_exported=True,
+                    params=[
+                        Param(name="x", type=types.Placeholder(text="i32")),
+                        Param(name="y", type=types.Placeholder(text="i32")),
+                    ],
+                    functions=[],
+                )
+            ],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[],
+                )
+            ],
+        ),
     )
 
 
@@ -452,27 +501,40 @@ def test_data_vector_with_simple_function():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[
-            DataDef(
-                name="Vector",
-                is_exported=True,
-                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
-                functions=[
-                    Function(
-                        name="length",
-                        is_exported=False,
-                        params=[],
-                        result="i32",
-                        body=[Number(value=42)],
-                    )
-                ],
-            )
-        ],
-        functions=[
-            Function(name="Main", is_exported=True, params=[], result=None, body=[])
-        ],
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[
+                DataDef(
+                    name="Vector",
+                    type=types.Placeholder(text="Vector"),
+                    is_exported=True,
+                    params=[
+                        Param(name="x", type=types.Placeholder(text="i32")),
+                        Param(name="y", type=types.Placeholder(text="i32")),
+                    ],
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[],
+                            type=types.Placeholder(text="i32"),
+                            body=[Number(value=42)],
+                        )
+                    ],
+                )
+            ],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[],
+                )
+            ],
+        ),
     )
 
 
@@ -493,53 +555,62 @@ def test_data_vector_with_simple_function_call():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[
-            DataDef(
-                name="Vector",
-                is_exported=True,
-                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
-                functions=[
-                    Function(
-                        name="length",
-                        is_exported=False,
-                        params=[],
-                        result="i32",
-                        body=[Number(value=42)],
-                    )
-                ],
-            )
-        ],
-        functions=[
-            Function(
-                name="Main",
-                is_exported=True,
-                params=[],
-                result=None,
-                body=[
-                    Let(
-                        name="vector",
-                        value=FunctionCall(
-                            name="Vector",
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[
+                DataDef(
+                    name="Vector",
+                    type=types.Placeholder(text="Vector"),
+                    is_exported=True,
+                    params=[
+                        Param(name="x", type=types.Placeholder(text="i32")),
+                        Param(name="y", type=types.Placeholder(text="i32")),
+                    ],
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[],
+                            type=types.Placeholder(text="i32"),
+                            body=[Number(value=42)],
+                        )
+                    ],
+                )
+            ],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[
+                        Let(
+                            name="vector",
+                            value=FunctionCall(
+                                name="Vector",
+                                arguments=[
+                                    Argument(name="x", value=Number(value=10)),
+                                    Argument(name="y", value=Number(value=20)),
+                                ],
+                            ),
+                        ),
+                        FunctionCall(
+                            name="println",
                             arguments=[
-                                Argument(name="x", value=Number(value=10)),
-                                Argument(name="y", value=Number(value=20)),
+                                Argument(
+                                    name="value",
+                                    value=FunctionCall(
+                                        name="vector.length", arguments=[]
+                                    ),
+                                )
                             ],
                         ),
-                    ),
-                    FunctionCall(
-                        name="println",
-                        arguments=[
-                            Argument(
-                                name="value",
-                                value=FunctionCall(name="vector.length", arguments=[]),
-                            )
-                        ],
-                    ),
-                ],
-            )
-        ],
+                    ],
+                )
+            ],
+        ),
     )
 
 
@@ -559,58 +630,75 @@ def test_data_vector_with_complex_function():
      """
     result = get_ast(source)
 
-    assert result == Program(
-        imports=[Import(value="System::Output")],
-        data_defs=[
-            DataDef(
-                name="Vector",
-                is_exported=True,
-                params=[Param(name="x", type="i32"), Param(name="y", type="i32")],
-                functions=[
-                    Function(
-                        name="add",
-                        is_exported=False,
-                        params=[
-                            Param(name="self", type="Vector"),
-                            Param(name="other", type="Vector"),
-                        ],
-                        result="Vector",
-                        body=[
-                            FunctionCall(
-                                name="Vector",
-                                arguments=[
-                                    Argument(
-                                        name="x",
-                                        value=BinaryOperation(
-                                            operator=BinaryOperator.ADD,
-                                            left=MemberAccess(
-                                                value=Variable("self"), member="x"
-                                            ),
-                                            right=MemberAccess(
-                                                value=Variable("other"), member="x"
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[
+                DataDef(
+                    name="Vector",
+                    type=types.Placeholder(text="Vector"),
+                    is_exported=True,
+                    params=[
+                        Param(name="x", type=types.Placeholder(text="i32")),
+                        Param(name="y", type=types.Placeholder(text="i32")),
+                    ],
+                    functions=[
+                        Function(
+                            name="add",
+                            is_exported=False,
+                            params=[
+                                Param(
+                                    name="self", type=types.Placeholder(text="Vector")
+                                ),
+                                Param(
+                                    name="other", type=types.Placeholder(text="Vector")
+                                ),
+                            ],
+                            type=types.Placeholder(text="Vector"),
+                            body=[
+                                FunctionCall(
+                                    name="Vector",
+                                    arguments=[
+                                        Argument(
+                                            name="x",
+                                            value=BinaryOperation(
+                                                operator=BinaryOperator.ADD,
+                                                left=MemberAccess(
+                                                    value=Variable("self"), member="x"
+                                                ),
+                                                right=MemberAccess(
+                                                    value=Variable("other"), member="x"
+                                                ),
                                             ),
                                         ),
-                                    ),
-                                    Argument(
-                                        name="y",
-                                        value=BinaryOperation(
-                                            operator=BinaryOperator.ADD,
-                                            left=MemberAccess(
-                                                value=Variable("self"), member="y"
-                                            ),
-                                            right=MemberAccess(
-                                                value=Variable("other"), member="y"
+                                        Argument(
+                                            name="y",
+                                            value=BinaryOperation(
+                                                operator=BinaryOperator.ADD,
+                                                left=MemberAccess(
+                                                    value=Variable("self"), member="y"
+                                                ),
+                                                right=MemberAccess(
+                                                    value=Variable("other"), member="y"
+                                                ),
                                             ),
                                         ),
-                                    ),
-                                ],
-                            )
-                        ],
-                    )
-                ],
-            )
-        ],
-        functions=[
-            Function(name="Main", is_exported=True, params=[], result=None, body=[])
-        ],
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[],
+                )
+            ],
+        ),
     )

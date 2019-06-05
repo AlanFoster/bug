@@ -9,6 +9,7 @@ pytest-black = "*"
 pytest-flake8 = "*"
 pdbpp = "*"
 snapshottest = "*"
+prettyprinter = "*"
 
 [packages]
 antlr4-python3-runtime = "*"

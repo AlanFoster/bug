@@ -2,6 +2,7 @@ from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
+from symbol_table.types import Type
 
 
 @dataclass
@@ -18,7 +19,6 @@ class Number(Node):
         return visitor.visit_number(self)
 
 
-@dataclass
 class BinaryOperator(Enum):
     ADD = 1
     MULTIPLY = 2
@@ -49,7 +49,7 @@ class Import(Node):
 @dataclass
 class Param(Node):
     name: str
-    type: str
+    type: Type
 
     def accept(self, visitor: "AstVisitor"):
         return visitor.visit_param(self)
@@ -79,7 +79,7 @@ class Function(Node):
     name: str
     is_exported: bool
     params: List[Param]
-    result: Optional[str]
+    type: Type
     body: List[Node]
 
     def accept(self, visitor: "AstVisitor"):
@@ -90,8 +90,10 @@ class Function(Node):
 class DataDef(Node):
     name: str
     is_exported: bool
+    # TODO: Rename this to fields
     params: List[Param]
     functions: List[Function]
+    type: Type
 
     def accept(self, visitor: "AstVisitor"):
         return visitor.visit_data_def(self)

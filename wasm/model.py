@@ -42,7 +42,7 @@ class Local:
 
 @dataclass
 class Result:
-    type: str
+    type: Optional[str]
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_result(self)
@@ -76,7 +76,7 @@ class Func(Instruction):
     params: List[Param]
     locals: List[Local]
     instructions: List[Instruction]
-    result: Optional[Result]
+    result: Result
 
     def accept(self, visitor: "WasmVisitor"):
         return visitor.visit_func(self)

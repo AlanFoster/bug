@@ -55,7 +55,7 @@ class WasmPrinter(WasmVisitor):
             params = [param.accept(self) for param in import_.params]
             result += " " + " ".join(params)
 
-        if import_.result:
+        if import_.result.type is not None:
             result += " " + import_.result.accept(self)
 
         result += ")\n"
@@ -86,7 +86,7 @@ class WasmPrinter(WasmVisitor):
             params = [param.accept(self) for param in func.params]
             result += " " + " ".join(params)
 
-        if func.result:
+        if func.result.type is not None:
             result += " " + func.result.accept(self)
 
         if func.locals:
@@ -160,7 +160,7 @@ class WasmPrinter(WasmVisitor):
         result = self.with_indentation("(if\n")
 
         self.indentation += 1
-        if if_.result:
+        if if_.result.type is not None:
             result += self.with_indentation(if_.result.accept(self)) + "\n"
 
         if if_.condition:

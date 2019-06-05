@@ -1,5 +1,6 @@
 from parser.BugParser import BugParser
 from parser.BugParserVisitor import BugParserVisitor
+from symbol_table import types
 from .ast import (
     Program,
     If,
@@ -78,7 +79,7 @@ class ParseTreeVisitor(BugParserVisitor):
             for param in ctx.parameterList().params:
                 var_name = param.variableName().getText()
                 type_ = param.typeName().getText()
-                params.append(Param(type=type_, name=var_name))
+                params.append(Param(type=types.Placeholder(type_), name=var_name))
         body = self.visit(ctx.functionBody())
 
         return Function(
@@ -86,7 +87,7 @@ class ParseTreeVisitor(BugParserVisitor):
             name=function_name,
             is_exported=ctx.EXPORT() is not None,
             params=params,
-            result=None if return_type == "void" else return_type,
+            type=types.Placeholder(text=return_type),
             body=body,
         )
 
@@ -97,14 +98,16 @@ class ParseTreeVisitor(BugParserVisitor):
             for param in ctx.dataList().params:
                 var_name = param.variableName().getText()
                 type_ = param.typeName().getText()
-                params.append(Param(type=type_, name=var_name))
+                params.append(Param(type=types.Placeholder(type_), name=var_name))
         functions = []
         if ctx.functionDef():
             for function in ctx.functionDef():
                 functions.append(self.visit(function))
 
+        name = ctx.dataName().getText()
         return DataDef(
-            name=ctx.dataName().getText(),
+            name=name,
+            type=types.Placeholder(text=name),
             is_exported=ctx.EXPORT() is not None,
             params=params,
             functions=functions,

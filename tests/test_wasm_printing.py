@@ -32,7 +32,7 @@ def test_simple_expression(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param(type="i32", name=None)],
-                result=None,
+                result=Result(type=None),
             )
         ],
         instructions=[
@@ -41,7 +41,7 @@ def test_simple_expression(snapshot):
                 export="Main",
                 locals=[],
                 params=[],
-                result=None,
+                result=Result(type=None),
                 instructions=[
                     Call(
                         name="$output_println",
@@ -73,7 +73,7 @@ def test_function_call_with_params_and_locals(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param(type="i32", name=None)],
-                result=None,
+                result=Result(type=None),
             )
         ],
         instructions=[
@@ -100,7 +100,7 @@ def test_function_call_with_params_and_locals(snapshot):
                 export="Main",
                 params=[],
                 locals=[Local(type="i32", name="$a"), Local(type="i32", name="$b")],
-                result=None,
+                result=Result(type=None),
                 instructions=[
                     SetLocal(name="$a", val=Const(type="i32", val="2")),
                     SetLocal(name="$b", val=Const(type="i32", val="3")),
@@ -129,7 +129,7 @@ def test_conditionals(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param(type="i32", name=None)],
-                result=None,
+                result=Result(type=None),
             )
         ],
         instructions=[
@@ -141,7 +141,7 @@ def test_conditionals(snapshot):
                 locals=[],
                 instructions=[
                     If(
-                        result=None,
+                        result=Result(type=None),
                         condition=BinaryOperation(
                             op="i32.lt_s",
                             left=Const(type="i32", val="9"),
@@ -172,7 +172,7 @@ def test_conditionals(snapshot):
                 export="Main",
                 params=[],
                 locals=[],
-                result=None,
+                result=Result(type=None),
                 instructions=[Call(name="$Foo", arguments=[]), Drop()],
             ),
         ],
@@ -189,7 +189,7 @@ def test_returns(snapshot):
                 name="$output_println",
                 import_=("System::Output", "println"),
                 params=[Param(type="i32", name=None)],
-                result=None,
+                result=Result(type=None),
             )
         ],
         instructions=[
@@ -203,7 +203,7 @@ def test_returns(snapshot):
             ),
             Func(
                 name="$output_meaning_of_life",
-                result=None,
+                result=Result(type=None),
                 export=None,
                 locals=[],
                 params=[],
@@ -217,7 +217,7 @@ def test_returns(snapshot):
                 export="Main",
                 locals=[],
                 params=[],
-                result=None,
+                result=Result(type=None),
                 instructions=[Call(name="$output_meaning_of_life", arguments=[])],
             ),
         ],

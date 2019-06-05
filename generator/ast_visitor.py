@@ -1,6 +1,8 @@
+from typing import Optional
+
 from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolKind, SymbolTable
+from symbol_table import types
 import compiler.ast as ast
-from symbol_table.type import Data, Type, I32
 from wasm.model import (
     Module,
     Func,
@@ -40,33 +42,24 @@ def get_binary_operator(operator):
         raise NotImplementedError(f"Binary operator '{operator}' not implemented.")
 
 
-# TODO: Add language support for type inference
-def infer_type(variable_name: str) -> Type:
+# TODO: Add language support for type inference within the semantic analysis stage
+def infer_type(variable_name: str) -> types.Type:
     if variable_name.startswith("vector"):
-        return Data(name="Vector")
+        return types.DataRef(name="Vector")
     else:
-        return I32()
+        return types.I32()
 
 
-def as_language_type(type_: str, symbol_table: SymbolTable) -> Type:
-    if type_ == "i32":
-        return I32()
-    if symbol_table.has(type_):
-        return symbol_table.get(type_).type
-    else:
-        raise NotImplementedError()
-
-
-def as_wasm_type(type_: Type) -> str:
-    if type_.is_data():
-        # If the required language type is data, then we require a i32 pointer
+def as_wasm_type(type_: types.Type) -> Optional[str]:
+    if type_.is_data_ref():
+        # If the required language type is a data ref, then we require a i32 pointer
         return "i32"
     elif type_.is_i32():
         return "i32"
     elif type_.is_void():
-        raise NotImplementedError()
+        return None
     else:
-        raise NotImplementedError()
+        raise TypeError(f"{type_}")
 
 
 class AstVisitor(ast.AstVisitor):
@@ -131,7 +124,7 @@ class AstVisitor(ast.AstVisitor):
             # implemented with Call containing an expression in the future
             target, method = function_call.name.split(".")
             target_symbol = self.symbol_table.get(target)
-            if target_symbol.type.is_data():
+            if target_symbol.type.is_data_ref():
                 function_name = f"${target_symbol.type.name}.{method}"
             else:
                 raise NotImplementedError()
@@ -151,7 +144,7 @@ class AstVisitor(ast.AstVisitor):
         # Place the current function into the symbol table so that it can be called by
         # other functions later, or recursively if required.
         function_symbol = Symbol(
-            name=function.name, type=function.result, kind=SymbolKind.FUNC
+            name=function.name, type=function.type, kind=SymbolKind.FUNC
         )
         self.symbol_table.add(function_symbol)
         self.symbol_table = self.symbol_table.enter_scope()
@@ -159,11 +152,7 @@ class AstVisitor(ast.AstVisitor):
         # Populate the required params into the symbol table before compiling the function body
         params = []
         for param in function.params:
-            symbol = Symbol(
-                name=param.name,
-                type=as_language_type(param.type, self.symbol_table),
-                kind=SymbolKind.PARAM,
-            )
+            symbol = Symbol(name=param.name, type=param.type, kind=SymbolKind.PARAM)
             self.symbol_table.add(symbol)
             params.append(Param(type="i32", name=symbol.generated_name))
         body = []
@@ -178,6 +167,7 @@ class AstVisitor(ast.AstVisitor):
             )
         self.symbol_table = self.symbol_table.exit_scope()
 
+        assert isinstance(function.type, types.Function)
         return Func(
             # Note: The function name is the internally generated name for this module
             # Data definitions can have associated functions, in this case they will be compiled as:
@@ -190,11 +180,7 @@ class AstVisitor(ast.AstVisitor):
             # Note: ast.The export name is the original function name
             export=function.name if function.is_exported else None,
             params=params,
-            result=Result(
-                as_wasm_type(as_language_type(function.result, self.symbol_table))
-            )
-            if function.result
-            else None,
+            result=Result(type=as_wasm_type(function.type.result)),
             locals=locals_,
             instructions=body,
         )
@@ -216,7 +202,7 @@ class AstVisitor(ast.AstVisitor):
             name="$output_println",
             import_=("System::Output", "println"),
             params=[Param(type="i32", name=None)],
-            result=None,
+            result=Result(type=None),
         )
 
     def visit_binary_operation(self, binary_operation: ast.BinaryOperation):
@@ -242,7 +228,7 @@ class AstVisitor(ast.AstVisitor):
         return If(
             condition=condition,
             # TODO: ast.The result type will have to be inferred correctly
-            result=None,
+            result=Result(type=None),
             then_statements=then_statements,
             else_statements=else_statements if else_statements else None,
         )
@@ -252,7 +238,7 @@ class AstVisitor(ast.AstVisitor):
 
         # Update the current symbol table with the current data class details
         self.symbol_table.add(
-            Symbol(name=data.name, type=Data(name=data.name), kind=SymbolKind.DATA)
+            Symbol(name=data.name, type=data.type, kind=SymbolKind.DATA)
         )
 
         # Specify all known functions
@@ -265,12 +251,13 @@ class AstVisitor(ast.AstVisitor):
         params = []
         param_assignments = []
         for index, param in enumerate(data.params):
-            # TODO: This should correctly understand that class types will be pointers, i.e. i32
-            type_ = "i32" if param.name == "self" else param.type
-            params.append(Param(type=type_, name=f"${param.name}"))
+            assert isinstance(param.type, types.Field)
+            params.append(
+                Param(type=as_wasm_type(param.type.type), name=f"${param.name}")
+            )
             param_assignments.append(
                 Store(
-                    type=param.type,
+                    type=as_wasm_type(param.type.type),
                     location=(
                         BinaryOperation(
                             op="i32.add",
@@ -305,7 +292,7 @@ class AstVisitor(ast.AstVisitor):
             self.symbol_table.add(
                 Symbol(
                     name=param.name,
-                    type=as_language_type(param.type, self.symbol_table),
+                    type=param.type,
                     kind=SymbolKind.DATA_FIELD,
                     field_number=index,
                 )

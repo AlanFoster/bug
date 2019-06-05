@@ -36,7 +36,7 @@ def main(argv: List[Any]) -> None:
 
     for target in configuration.targets:
         input_stream = antlr4.FileStream(str(target.file))
-        result = compiler.generate(input_stream)
+        result = compiler.compile(input_stream)
 
         with target.output.open(mode="w") as file:
             file.write(pretty_print(result))
