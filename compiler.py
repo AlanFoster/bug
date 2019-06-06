@@ -6,14 +6,20 @@ from typing import List, Any
 from wasm.printer import pretty_print
 import sys
 
+from wasm.wat_to_wasm import wat_to_wasm
+
 
 @dataclass(frozen=True)
 class CompileTarget:
     file: Path
 
     @property
-    def output(self):
+    def wat_path(self):
         return self.file.with_suffix(".wat")
+
+    @property
+    def wasm_path(self):
+        return self.file.with_suffix(".wasm")
 
 
 @dataclass(frozen=True)
@@ -36,10 +42,14 @@ def main(argv: List[Any]) -> None:
 
     for target in configuration.targets:
         input_stream = antlr4.FileStream(str(target.file))
-        result = compiler.compile(input_stream)
+        result = compiler.generate(input_stream)
+        wat = pretty_print(result)
 
-        with target.output.open(mode="w") as file:
-            file.write(pretty_print(result))
+        with target.wat_path.open(mode="w") as file:
+            file.write(wat)
+
+        with target.wasm_path.open(mode="wb") as file:
+            file.write(wat_to_wasm(wat))
 
 
 if __name__ == "__main__":

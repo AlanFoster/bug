@@ -261,5 +261,5 @@ class WasmPrinter(WasmVisitor):
         return ("    " * self.indentation) + str
 
 
-def pretty_print(module: Module):
+def pretty_print(module: Module) -> str:
     return module.accept(WasmPrinter())
