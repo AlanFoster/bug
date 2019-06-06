@@ -2,7 +2,7 @@ import antlr4
 
 import compiler.ast as ast
 from semantic_analysis.declaration_analysis_vistor import DeclarationAnalysisVisitor
-from generator.ast_visitor import AstVisitor as GeneratorAstVisitor
+from generator.wasm_generator_visitor import AstVisitor as GeneratorAstVisitor
 from generator.preamble import with_preamble
 from parser.BugLexer import BugLexer
 from parser.BugParser import BugParser
