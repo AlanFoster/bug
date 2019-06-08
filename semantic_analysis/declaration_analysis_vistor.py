@@ -26,8 +26,8 @@ def as_language_type(type_: types.Type, symbol_table: SymbolTable) -> types.Type
         return types.Void()
     if symbol_table.has(text):
         symbol = symbol_table.get(text)
-        assert symbol.type.is_data()
-        return types.DataRef(name=text)
+        assert symbol.type.is_data() or symbol.type.is_trait()
+        return types.TypeRef(name=text)
     else:
         raise TypeError(f"Type not supported: {type_}")
 
@@ -42,6 +42,8 @@ class DeclarationAnalysisVisitor(ast.AstVisitor):
             import_.accept(self)
 
         self.symbol_table = self.symbol_table.enter_scope()
+        for trait in program.traits:
+            trait.accept(self)
         for data_def in program.data_defs:
             data_def.accept(self)
         for function in program.functions:
@@ -105,8 +107,25 @@ class DeclarationAnalysisVisitor(ast.AstVisitor):
     def visit_if(self, if_: ast.If):
         raise NotImplementedError()
 
+    def visit_trait(self, trait: ast.Trait):
+        trait_type = types.Trait(name=trait.name, functions=[])
+        trait.type = trait_type
+        self.symbol_table.add(
+            Symbol(name=trait.name, type=trait_type, kind=SymbolKind.TRAIT)
+        )
+
+        self.symbol_table = self.symbol_table.enter_scope()
+        for function in trait.functions:
+            function.accept(self)
+        self.symbol_table = self.symbol_table.exit_scope()
+
+        return trait
+
     def visit_data_def(self, data: ast.DataDef):
-        data_def_type = types.Data(name=data.name, fields=[], functions=[])
+        implements = []
+        for implement in data.implements:
+            implements.append(types.TypeRef(name=implement))
+        data_def_type = types.Data(name=data.name, implements=implements, fields=[], functions=[])
         data.type = data_def_type
         self.symbol_table.add(
             Symbol(name=data.name, type=data_def_type, kind=SymbolKind.DATA)

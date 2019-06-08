@@ -45,11 +45,11 @@ def get_binary_operator(operator):
 # TODO: Add language support for type inference within the semantic analysis stage
 def infer_type(variable_name: str) -> types.Type:
     if variable_name.startswith("tail"):
-        return types.DataRef(name="VectorArray")
+        return types.TypeRef(name="VectorArray")
     elif variable_name.startswith("vectorArray"):
-        return types.DataRef(name="VectorArray")
+        return types.TypeRef(name="VectorArray")
     elif variable_name.startswith("vector"):
-        return types.DataRef(name="Vector")
+        return types.TypeRef(name="Vector")
     else:
         return types.I32()
 
