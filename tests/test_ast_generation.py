@@ -762,8 +762,7 @@ def test_data_vector_with_complex_function():
     )
 
 
-@pytest.mark.skip("Pending trait implementation.")
-def test_empty_trait():
+def test_trait_with_no_functions():
     source = """
         trait List {
 
@@ -775,14 +774,20 @@ def test_empty_trait():
         result,
         Program(
             imports=[],
-            traits=[Trait(name="List", type=types.Placeholder("List"), functions=[])],
+            traits=[
+                Trait(
+                    name="List",
+                    is_exported=False,
+                    type=types.Placeholder("List"),
+                    functions=[],
+                )
+            ],
             data_defs=[],
             functions=[],
         ),
     )
 
 
-@pytest.mark.skip("Pending trait implementation.")
 def test_trait_with_functions():
     source = """
         trait List {
@@ -799,6 +804,7 @@ def test_trait_with_functions():
             traits=[
                 Trait(
                     name="List",
+                    is_exported=False,
                     type=types.Placeholder("List"),
                     functions=[
                         Function(
@@ -807,8 +813,8 @@ def test_trait_with_functions():
                             params=[
                                 Param(name="self", type=types.Placeholder(text="List"))
                             ],
-                            type=types.Placeholder(text="length"),
-                            body=[],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
                         ),
                         Function(
                             name="sum",
@@ -816,8 +822,8 @@ def test_trait_with_functions():
                             params=[
                                 Param(name="self", type=types.Placeholder(text="List"))
                             ],
-                            type=types.Placeholder(text="sum"),
-                            body=[],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
                         ),
                     ],
                 )
@@ -828,12 +834,11 @@ def test_trait_with_functions():
     )
 
 
-@pytest.mark.skip("Pending trait implementation.")
 def test_trait_with_single_implementation():
     source = """
         trait List {
             function length(self: List): i32;
-            function sum(self: List): List;
+            function sum(self: List): i32;
         }
 
         data EmptyList() implements List {
@@ -855,6 +860,7 @@ def test_trait_with_single_implementation():
             traits=[
                 Trait(
                     name="List",
+                    is_exported=False,
                     type=types.Placeholder("List"),
                     functions=[
                         Function(
@@ -863,8 +869,8 @@ def test_trait_with_single_implementation():
                             params=[
                                 Param(name="self", type=types.Placeholder(text="List"))
                             ],
-                            type=types.Placeholder(text="length"),
-                            body=[],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
                         ),
                         Function(
                             name="sum",
@@ -872,8 +878,8 @@ def test_trait_with_single_implementation():
                             params=[
                                 Param(name="self", type=types.Placeholder(text="List"))
                             ],
-                            type=types.Placeholder(text="length"),
-                            body=[],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
                         ),
                     ],
                 )
@@ -882,7 +888,7 @@ def test_trait_with_single_implementation():
                 DataDef(
                     name="EmptyList",
                     is_exported=False,
-                    implements=["list"],
+                    implements=["List"],
                     params=[],
                     functions=[
                         Function(
@@ -912,7 +918,6 @@ def test_trait_with_single_implementation():
     )
 
 
-@pytest.mark.skip("Pending trait implementation.")
 def test_trait_with_multiple_implementations():
     source = """
         trait List {
@@ -949,7 +954,7 @@ def test_trait_with_multiple_implementations():
             traits=[
                 Trait(
                     name="List",
-                    type=types.Placeholder("List"),
+                    is_exported=False,
                     functions=[
                         Function(
                             name="length",
@@ -957,8 +962,8 @@ def test_trait_with_multiple_implementations():
                             params=[
                                 Param(name="self", type=types.Placeholder(text="List"))
                             ],
-                            type=types.Placeholder(text="length"),
-                            body=[],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
                         ),
                         Function(
                             name="sum",
@@ -966,17 +971,18 @@ def test_trait_with_multiple_implementations():
                             params=[
                                 Param(name="self", type=types.Placeholder(text="List"))
                             ],
-                            type=types.Placeholder(text="length"),
-                            body=[],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
                         ),
                     ],
+                    type=types.Placeholder(text="List"),
                 )
             ],
             data_defs=[
                 DataDef(
                     name="EmptyList",
                     is_exported=False,
-                    implements=["list"],
+                    implements=["List"],
                     params=[],
                     functions=[
                         Function(
@@ -1003,34 +1009,7 @@ def test_trait_with_multiple_implementations():
                 DataDef(
                     name="Cons",
                     is_exported=False,
-                    implements=["list"],
-                    params=[],
-                    functions=[
-                        Function(
-                            name="length",
-                            is_exported=False,
-                            params=[
-                                Param(name="self", type=types.Placeholder(text="List"))
-                            ],
-                            type=types.Placeholder(text="i32"),
-                            body=[Number(value=0)],
-                        ),
-                        Function(
-                            name="sum",
-                            is_exported=False,
-                            params=[
-                                Param(name="self", type=types.Placeholder(text="List"))
-                            ],
-                            type=types.Placeholder(text="i32"),
-                            body=[Number(value=0)],
-                        ),
-                    ],
-                    type=types.Placeholder(text="EmptyList"),
-                ),
-                DataDef(
-                    name="Cons",
-                    is_exported=False,
-                    implements=[],
+                    implements=["List"],
                     params=[
                         Param(name="head", type=types.Placeholder(text="i32")),
                         Param(name="tail", type=types.Placeholder(text="List")),

@@ -80,7 +80,8 @@ class Function(Node):
     is_exported: bool
     params: List[Param]
     type: Type
-    body: List[Node]
+    # The function body can be empty for trait definitions
+    body: Optional[List[Node]]
 
     def accept(self, visitor: "AstVisitor"):
         return visitor.visit_function(self)
