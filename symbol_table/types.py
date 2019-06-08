@@ -3,22 +3,25 @@ from typing import Optional, List
 
 
 class Type:
-    def is_i32(self):
+    def is_i32(self) -> bool:
         return False
 
-    def is_data(self):
+    def is_trait(self) -> bool:
         return False
 
-    def is_data_ref(self):
+    def is_data(self) -> bool:
         return False
 
-    def is_void(self):
+    def is_data_ref(self) -> bool:
         return False
 
-    def is_function(self):
+    def is_void(self) -> bool:
         return False
 
-    def is_placeholder(self):
+    def is_function(self) -> bool:
+        return False
+
+    def is_placeholder(self) -> bool:
         return False
 
 
@@ -26,7 +29,7 @@ class Type:
 class Placeholder(Type):
     """
     Placeholder type which is used until the real type information is known.
-    This value is used during the initial parse -> ast stage before semantic analysis occurs.
+    This value is used during the initial parse -> ast_generaton stage before semantic analysis occurs.
 
     The text represents the raw text value of the given Type information if it was present.
     """
@@ -39,13 +42,13 @@ class Placeholder(Type):
 
 @dataclass
 class I32(Type):
-    def is_i32(self):
+    def is_i32(self) -> bool:
         return True
 
 
 @dataclass
 class Void(Type):
-    def is_void(self):
+    def is_void(self) -> bool:
         return True
 
 
@@ -69,22 +72,33 @@ class Field(Type):
 
 
 @dataclass
-class Data(Type):
-    name: str
-    fields: List[Field]
-    functions: List[Function]
+class TypeRef(Type):
+    """
+    Type ref is a reference to a data/trait definition type accessed via a string instead of a concrete type.
+    This is used for 'lazy' evaluation of the type after the declarative semantic analysis has complete.
+    """
 
-    def is_data(self):
+    name: str
+
+    def is_data_ref(self) -> bool:
         return True
 
 
 @dataclass
-class DataRef(Type):
-    """
-    Data ref is a reference to a data definition type accessed via a string instead of a concrete type.
-    """
-
+class Trait(Type):
     name: str
+    functions: List[Function]
 
-    def is_data_ref(self):
+    def is_trait(self) -> bool:
+        return True
+
+
+@dataclass
+class Data(Type):
+    name: str
+    implements: List[TypeRef]
+    fields: List[Field]
+    functions: List[Function]
+
+    def is_data(self) -> bool:
         return True

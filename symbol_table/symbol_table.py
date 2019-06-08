@@ -12,6 +12,7 @@ class SymbolKind(Enum):
     FUNC = 3
     DATA = 4
     DATA_FIELD = 5
+    TRAIT = 6
 
 
 @dataclass

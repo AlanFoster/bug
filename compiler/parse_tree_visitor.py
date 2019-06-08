@@ -17,6 +17,7 @@ from .ast import (
     Return,
     DataDef,
     MemberAccess,
+    Trait,
 )
 
 
@@ -50,8 +51,13 @@ class ParseTreeVisitor(BugParserVisitor):
         data_defs = []
         for data in ctx.data():
             data_defs.append(self.visit(data))
+        traits = []
+        for trait in ctx.trait():
+            traits.append(self.visit(trait))
 
-        return Program(imports=imports, functions=functions, data_defs=data_defs)
+        return Program(
+            imports=imports, traits=traits, functions=functions, data_defs=data_defs
+        )
 
     # Visit a parse tree produced by BugParser#importStatements.
     def visitImportStatements(self, ctx: BugParser.ImportStatementsContext):
@@ -91,6 +97,49 @@ class ParseTreeVisitor(BugParserVisitor):
             body=body,
         )
 
+    # Visit a parse tree produced by BugParser#trait.
+    def visitTrait(self, ctx: BugParser.TraitContext):
+        name = ctx.traitName().getText()
+
+        functions = []
+        for function in ctx.traitFunctionDef():
+            functions.append(self.visit(function))
+
+        return Trait(
+            name=name,
+            is_exported=False,
+            functions=functions,
+            type=types.Placeholder(text=name),
+        )
+
+    # Visit a parse tree produced by BugParser#traitName.
+    def visitTraitName(self, ctx: BugParser.TraitNameContext):
+        raise NotImplementedError()
+
+    # Visit a parse tree produced by BugParser#traitFunctionDef.
+    def visitTraitFunctionDef(self, ctx: BugParser.TraitFunctionDefContext):
+        function_name = ctx.traitFunctionName().getText()
+        return_type = ctx.returnTypeName().getText()
+
+        params = []
+        if ctx.parameterList():
+            for param in ctx.parameterList().params:
+                var_name = param.variableName().getText()
+                type_ = param.typeName().getText()
+                params.append(Param(type=types.Placeholder(type_), name=var_name))
+
+        return Function(
+            name=function_name,
+            is_exported=False,
+            params=params,
+            type=types.Placeholder(text=return_type),
+            body=None,
+        )
+
+    # Visit a parse tree produced by BugParser#traitFunctionName.
+    def visitTraitFunctionName(self, ctx: BugParser.TraitFunctionNameContext):
+        raise NotImplementedError()
+
     # Visit a parse tree produced by BugParser#data.
     def visitData(self, ctx: BugParser.DataContext):
         params = []
@@ -104,9 +153,14 @@ class ParseTreeVisitor(BugParserVisitor):
             for function in ctx.functionDef():
                 functions.append(self.visit(function))
 
+        implements = []
+        if ctx.traitName():
+            implements.append(ctx.traitName().getText())
+
         name = ctx.dataName().getText()
         return DataDef(
             name=name,
+            implements=implements,
             type=types.Placeholder(text=name),
             is_exported=ctx.EXPORT() is not None,
             params=params,

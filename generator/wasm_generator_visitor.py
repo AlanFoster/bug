@@ -1,6 +1,6 @@
 from typing import Optional
 
-from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolKind, SymbolTable
+from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolKind
 from symbol_table import types
 import compiler.ast as ast
 from wasm.model import (
@@ -45,11 +45,11 @@ def get_binary_operator(operator):
 # TODO: Add language support for type inference within the semantic analysis stage
 def infer_type(variable_name: str) -> types.Type:
     if variable_name.startswith("tail"):
-        return types.DataRef(name="VectorArray")
+        return types.TypeRef(name="VectorArray")
     elif variable_name.startswith("vectorArray"):
-        return types.DataRef(name="VectorArray")
+        return types.TypeRef(name="VectorArray")
     elif variable_name.startswith("vector"):
-        return types.DataRef(name="Vector")
+        return types.TypeRef(name="Vector")
     else:
         return types.I32()
 
@@ -112,7 +112,7 @@ class AstVisitor(ast.AstVisitor):
     def visit_function_call(self, function_call: ast.FunctionCall):
         is_method_access = "." in function_call.name
 
-        # Note: ast.This will need to use a real symbol table in the future
+        # Note: ast_generaton.This will need to use a real symbol table in the future
         if function_call.name == "println":
             function_name = "$output_println"
         elif self.symbol_table.has(function_call.name):
@@ -181,7 +181,7 @@ class AstVisitor(ast.AstVisitor):
                 if self.data_name
                 else f"${function.name}"
             ),
-            # Note: ast.The export name is the original function name
+            # Note: ast_generaton.The export name is the original function name
             export=function.name if function.is_exported else None,
             params=params,
             result=Result(type=as_wasm_type(function.type.result)),
@@ -231,7 +231,7 @@ class AstVisitor(ast.AstVisitor):
 
         return If(
             condition=condition,
-            # TODO: ast.The result type will have to be inferred correctly
+            # TODO: ast_generaton.The result type will have to be inferred correctly
             result=Result(type=None),
             then_statements=then_statements,
             else_statements=else_statements if else_statements else None,

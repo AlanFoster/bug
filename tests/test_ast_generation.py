@@ -17,6 +17,7 @@ from compiler.ast import (
     Return,
     DataDef,
     MemberAccess,
+    Trait,
 )
 from compiler import compiler
 from compiler.error_listener import BugSyntaxException
@@ -34,7 +35,9 @@ def test_empty_program():
     source = ""
     result = get_ast(source)
 
-    assert_equal_programs(result, Program(imports=[], data_defs=[], functions=[]))
+    assert_equal_programs(
+        result, Program(imports=[], traits=[], data_defs=[], functions=[])
+    )
 
 
 def test_invalid_program():
@@ -43,8 +46,8 @@ def test_invalid_program():
     with pytest.raises(BugSyntaxException) as e:
         get_ast(source)
     assert (
-            str(e.value)
-            == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
+        str(e.value)
+        == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
     )
 
 
@@ -62,6 +65,7 @@ def test_simple_expression():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -110,6 +114,7 @@ def test_simple_assignment():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -158,6 +163,7 @@ def test_function_call_with_no_arguments():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -202,6 +208,7 @@ def test_function_call_with_arguments():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -270,6 +277,7 @@ def test_if_statement():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -318,6 +326,7 @@ def test_if_else_statement():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -378,6 +387,7 @@ def test_factorial():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[],
             functions=[
                 Function(
@@ -460,13 +470,14 @@ def test_empty_data():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[
                 DataDef(
                     name="Empty",
+                    implements=[],
                     type=types.Placeholder(text="Empty"),
                     is_exported=True,
-                    params=[
-                    ],
+                    params=[],
                     functions=[],
                 )
             ],
@@ -499,9 +510,11 @@ def test_data_vector():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[
                 DataDef(
                     name="Vector",
+                    implements=[],
                     type=types.Placeholder(text="Vector"),
                     is_exported=True,
                     params=[
@@ -544,9 +557,11 @@ def test_data_vector_with_simple_function():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[
                 DataDef(
                     name="Vector",
+                    implements=[],
                     type=types.Placeholder(text="Vector"),
                     is_exported=True,
                     params=[
@@ -598,9 +613,11 @@ def test_data_vector_with_simple_function_call():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[
                 DataDef(
                     name="Vector",
+                    implements=[],
                     type=types.Placeholder(text="Vector"),
                     is_exported=True,
                     params=[
@@ -673,9 +690,11 @@ def test_data_vector_with_complex_function():
         result,
         Program(
             imports=[Import(value="System::Output")],
+            traits=[],
             data_defs=[
                 DataDef(
                     name="Vector",
+                    implements=[],
                     type=types.Placeholder(text="Vector"),
                     is_exported=True,
                     params=[
@@ -739,5 +758,303 @@ def test_data_vector_with_complex_function():
                     body=[],
                 )
             ],
+        ),
+    )
+
+
+def test_trait_with_no_functions():
+    source = """
+        trait List {
+
+        }
+     """
+    result = get_ast(source)
+
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[],
+            traits=[
+                Trait(
+                    name="List",
+                    is_exported=False,
+                    type=types.Placeholder("List"),
+                    functions=[],
+                )
+            ],
+            data_defs=[],
+            functions=[],
+        ),
+    )
+
+
+def test_trait_with_functions():
+    source = """
+        trait List {
+            function length(self: List): i32;
+            function sum(self: List): i32;
+        }
+     """
+    result = get_ast(source)
+
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[],
+            traits=[
+                Trait(
+                    name="List",
+                    is_exported=False,
+                    type=types.Placeholder("List"),
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
+                        ),
+                        Function(
+                            name="sum",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
+                        ),
+                    ],
+                )
+            ],
+            data_defs=[],
+            functions=[],
+        ),
+    )
+
+
+def test_trait_with_single_implementation():
+    source = """
+        trait List {
+            function length(self: List): i32;
+            function sum(self: List): i32;
+        }
+
+        data EmptyList() implements List {
+            function length(self: List): i32 {
+                0;
+            }
+
+            function sum(self: List): i32 {
+                0;
+            }
+        }
+     """
+    result = get_ast(source)
+
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[],
+            traits=[
+                Trait(
+                    name="List",
+                    is_exported=False,
+                    type=types.Placeholder("List"),
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
+                        ),
+                        Function(
+                            name="sum",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
+                        ),
+                    ],
+                )
+            ],
+            data_defs=[
+                DataDef(
+                    name="EmptyList",
+                    is_exported=False,
+                    implements=["List"],
+                    params=[],
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=[Number(value=0)],
+                        ),
+                        Function(
+                            name="sum",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=[Number(value=0)],
+                        ),
+                    ],
+                    type=types.Placeholder(text="EmptyList"),
+                )
+            ],
+            functions=[],
+        ),
+    )
+
+
+def test_trait_with_multiple_implementations():
+    source = """
+        trait List {
+            function length(self: List): i32;
+            function sum(self: List): i32;
+        }
+
+        data EmptyList() implements List {
+            function length(self: List): i32 {
+                0;
+            }
+
+            function sum(self: List): i32 {
+                0;
+            }
+        }
+
+        data Cons(head: i32, tail: List) implements List {
+            function length(self: List): i32 {
+                1 + self.tail.length();
+            }
+
+            function sum(self: List): i32 {
+                self.head + self.tail.sum();
+            }
+        }
+     """
+    result = get_ast(source)
+
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[],
+            traits=[
+                Trait(
+                    name="List",
+                    is_exported=False,
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
+                        ),
+                        Function(
+                            name="sum",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=None,
+                        ),
+                    ],
+                    type=types.Placeholder(text="List"),
+                )
+            ],
+            data_defs=[
+                DataDef(
+                    name="EmptyList",
+                    is_exported=False,
+                    implements=["List"],
+                    params=[],
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=[Number(value=0)],
+                        ),
+                        Function(
+                            name="sum",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=[Number(value=0)],
+                        ),
+                    ],
+                    type=types.Placeholder(text="EmptyList"),
+                ),
+                DataDef(
+                    name="Cons",
+                    is_exported=False,
+                    implements=["List"],
+                    params=[
+                        Param(name="head", type=types.Placeholder(text="i32")),
+                        Param(name="tail", type=types.Placeholder(text="List")),
+                    ],
+                    functions=[
+                        Function(
+                            name="length",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=[
+                                BinaryOperation(
+                                    operator=BinaryOperator.ADD,
+                                    left=Number(value=1),
+                                    right=FunctionCall(
+                                        name="self.tail.length", arguments=[]
+                                    ),
+                                )
+                            ],
+                        ),
+                        Function(
+                            name="sum",
+                            is_exported=False,
+                            params=[
+                                Param(name="self", type=types.Placeholder(text="List"))
+                            ],
+                            type=types.Placeholder(text="i32"),
+                            body=[
+                                BinaryOperation(
+                                    operator=BinaryOperator.ADD,
+                                    left=MemberAccess(
+                                        value=Variable(name="self"), member="head"
+                                    ),
+                                    right=FunctionCall(
+                                        name="self.tail.sum", arguments=[]
+                                    ),
+                                )
+                            ],
+                        ),
+                    ],
+                    type=types.Placeholder(text="Cons"),
+                ),
+            ],
+            functions=[],
         ),
     )

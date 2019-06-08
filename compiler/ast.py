@@ -80,16 +80,29 @@ class Function(Node):
     is_exported: bool
     params: List[Param]
     type: Type
-    body: List[Node]
+    # The function body can be empty for trait definitions
+    body: Optional[List[Node]]
 
     def accept(self, visitor: "AstVisitor"):
         return visitor.visit_function(self)
 
 
 @dataclass
+class Trait(Node):
+    name: str
+    is_exported: bool
+    functions: List[Function]
+    type: Type
+
+    def accept(self, visitor: "AstVisitor"):
+        return visitor.visit_trait(self)
+
+
+@dataclass
 class DataDef(Node):
     name: str
     is_exported: bool
+    implements: List[str]
     # TODO: Rename this to fields
     params: List[Param]
     functions: List[Function]
@@ -147,6 +160,7 @@ class Variable(Node):
 @dataclass
 class Program:
     imports: List[Import]
+    traits: List[Trait]
     data_defs: List[DataDef]
     functions: List[Function]
 
@@ -201,6 +215,10 @@ class AstVisitor:
 
     @abstractmethod
     def visit_if(self, if_: If):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def visit_trait(self, trait: Trait):
         raise NotImplementedError()
 
     @abstractmethod
