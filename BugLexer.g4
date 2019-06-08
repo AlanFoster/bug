@@ -6,6 +6,8 @@ ELSE: 'else' ;
 FOR: 'for' ;
 IN: 'in' ;
 LET: 'let' ;
+TRAIT: 'trait' ;
+IMPLEMENTS: 'implements' ;
 DATA: 'data' ;
 EXPORT: 'export' ;
 IMPORT: 'import' ;

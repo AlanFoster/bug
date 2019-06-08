@@ -93,6 +93,22 @@ class ParseTreeVisitor(BugParserVisitor):
             body=body,
         )
 
+    # Visit a parse tree produced by BugParser#trait.
+    def visitTrait(self, ctx: BugParser.TraitContext):
+        return self.visitChildren(ctx)
+
+    # Visit a parse tree produced by BugParser#traitName.
+    def visitTraitName(self, ctx: BugParser.TraitNameContext):
+        return self.visitChildren(ctx)
+
+    # Visit a parse tree produced by BugParser#traitFunctionDef.
+    def visitTraitFunctionDef(self, ctx: BugParser.TraitFunctionDefContext):
+        return self.visitChildren(ctx)
+
+    # Visit a parse tree produced by BugParser#traitFunctionName.
+    def visitTraitFunctionName(self, ctx: BugParser.TraitFunctionNameContext):
+        return self.visitChildren(ctx)
+
     # Visit a parse tree produced by BugParser#data.
     def visitData(self, ctx: BugParser.DataContext):
         params = []

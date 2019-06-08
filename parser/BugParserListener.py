@@ -44,6 +44,42 @@ class BugParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by BugParser#trait.
+    def enterTrait(self, ctx:BugParser.TraitContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#trait.
+    def exitTrait(self, ctx:BugParser.TraitContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#traitName.
+    def enterTraitName(self, ctx:BugParser.TraitNameContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#traitName.
+    def exitTraitName(self, ctx:BugParser.TraitNameContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#traitFunctionDef.
+    def enterTraitFunctionDef(self, ctx:BugParser.TraitFunctionDefContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#traitFunctionDef.
+    def exitTraitFunctionDef(self, ctx:BugParser.TraitFunctionDefContext):
+        pass
+
+
+    # Enter a parse tree produced by BugParser#traitFunctionName.
+    def enterTraitFunctionName(self, ctx:BugParser.TraitFunctionNameContext):
+        pass
+
+    # Exit a parse tree produced by BugParser#traitFunctionName.
+    def exitTraitFunctionName(self, ctx:BugParser.TraitFunctionNameContext):
+        pass
+
+
     # Enter a parse tree produced by BugParser#data.
     def enterData(self, ctx:BugParser.DataContext):
         pass

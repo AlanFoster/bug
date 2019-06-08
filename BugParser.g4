@@ -3,7 +3,7 @@ parser grammar BugParser;
 options { tokenVocab=BugLexer; }
 
 program:
-    importStatements (data | functionDef)*
+    importStatements (trait | data | functionDef)*
     EOF
     ;
 
@@ -14,8 +14,19 @@ functionDef:
     'export'? 'function' functionName '(' parameterList? ')' ':' returnTypeName '{' functionBody '}'
     ;
 
+trait:
+    'trait' traitName '{' traitFunctionDef* '}' ;
+
+traitName: IDENTIFIER ;
+
+traitFunctionDef:
+    'function' traitFunctionName '(' parameterList ')' ':' returnTypeName ';' ;
+
+traitFunctionName: IDENTIFIER ;
+
 data:
     'export'? 'data' dataName '(' dataList? ')'
+        ('implements' traitName) ?
         ('{' functionDef* '}') ?
     ;
 
