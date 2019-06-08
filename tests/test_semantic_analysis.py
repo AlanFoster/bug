@@ -25,6 +25,7 @@ def test_simple_expression():
         result,
         ast.Program(
             imports=[],
+            traits=[],
             data_defs=[],
             functions=[
                 ast.Function(
@@ -74,9 +75,11 @@ def test_data_vector_with_complex_function():
         result,
         ast.Program(
             imports=[ast.Import(value="System::Output")],
+            traits=[],
             data_defs=[
                 ast.DataDef(
                     name="Vector",
+                    implements=[],
                     is_exported=True,
                     params=[
                         ast.Param(

@@ -51,7 +51,9 @@ class ParseTreeVisitor(BugParserVisitor):
         for data in ctx.data():
             data_defs.append(self.visit(data))
 
-        return Program(imports=imports, functions=functions, data_defs=data_defs)
+        return Program(
+            imports=imports, traits=[], functions=functions, data_defs=data_defs
+        )
 
     # Visit a parse tree produced by BugParser#importStatements.
     def visitImportStatements(self, ctx: BugParser.ImportStatementsContext):
@@ -107,6 +109,8 @@ class ParseTreeVisitor(BugParserVisitor):
         name = ctx.dataName().getText()
         return DataDef(
             name=name,
+            # TODO:
+            implements=[],
             type=types.Placeholder(text=name),
             is_exported=ctx.EXPORT() is not None,
             params=params,

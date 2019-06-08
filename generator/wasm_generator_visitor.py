@@ -1,6 +1,6 @@
 from typing import Optional
 
-from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolKind, SymbolTable
+from symbol_table.symbol_table import EmptySymbolTable, Symbol, SymbolKind
 from symbol_table import types
 import compiler.ast as ast
 from wasm.model import (
@@ -112,7 +112,7 @@ class AstVisitor(ast.AstVisitor):
     def visit_function_call(self, function_call: ast.FunctionCall):
         is_method_access = "." in function_call.name
 
-        # Note: ast.This will need to use a real symbol table in the future
+        # Note: ast_generaton.This will need to use a real symbol table in the future
         if function_call.name == "println":
             function_name = "$output_println"
         elif self.symbol_table.has(function_call.name):
@@ -181,7 +181,7 @@ class AstVisitor(ast.AstVisitor):
                 if self.data_name
                 else f"${function.name}"
             ),
-            # Note: ast.The export name is the original function name
+            # Note: ast_generaton.The export name is the original function name
             export=function.name if function.is_exported else None,
             params=params,
             result=Result(type=as_wasm_type(function.type.result)),
@@ -231,7 +231,7 @@ class AstVisitor(ast.AstVisitor):
 
         return If(
             condition=condition,
-            # TODO: ast.The result type will have to be inferred correctly
+            # TODO: ast_generaton.The result type will have to be inferred correctly
             result=Result(type=None),
             then_statements=then_statements,
             else_statements=else_statements if else_statements else None,

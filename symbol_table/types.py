@@ -26,7 +26,7 @@ class Type:
 class Placeholder(Type):
     """
     Placeholder type which is used until the real type information is known.
-    This value is used during the initial parse -> ast stage before semantic analysis occurs.
+    This value is used during the initial parse -> ast_generaton stage before semantic analysis occurs.
 
     The text represents the raw text value of the given Type information if it was present.
     """
