@@ -44,7 +44,11 @@ def get_binary_operator(operator):
 
 # TODO: Add language support for type inference within the semantic analysis stage
 def infer_type(variable_name: str) -> types.Type:
-    if variable_name.startswith("vector"):
+    if variable_name.startswith("tail"):
+        return types.DataRef(name="VectorArray")
+    elif variable_name.startswith("vectorArray"):
+        return types.DataRef(name="VectorArray")
+    elif variable_name.startswith("vector"):
         return types.DataRef(name="Vector")
     else:
         return types.I32()
@@ -126,7 +130,7 @@ class AstVisitor(ast.AstVisitor):
             target_symbol = self.symbol_table.get(target)
             if target_symbol.type.is_data_ref():
                 function_name = f"${target_symbol.type.name}.{method}"
-            else:
+            elif self.symbol_table.has(target):
                 raise NotImplementedError()
         else:
             raise NotImplementedError(f"{function_call.name} not supported")

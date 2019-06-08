@@ -43,8 +43,8 @@ def test_invalid_program():
     with pytest.raises(BugSyntaxException) as e:
         get_ast(source)
     assert (
-        str(e.value)
-        == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
+            str(e.value)
+            == "Syntax error at line 1 column 22. mismatched input '<EOF>' expecting ':'"
     )
 
 
@@ -439,6 +439,45 @@ def test_factorial():
                         )
                     ],
                 ),
+            ],
+        ),
+    )
+
+
+def test_empty_data():
+    source = """
+        import System::Output;
+
+        export data Empty()
+
+        export function Main(): void {
+
+        }
+     """
+    result = get_ast(source)
+
+    assert_equal_programs(
+        result,
+        Program(
+            imports=[Import(value="System::Output")],
+            data_defs=[
+                DataDef(
+                    name="Empty",
+                    type=types.Placeholder(text="Empty"),
+                    is_exported=True,
+                    params=[
+                    ],
+                    functions=[],
+                )
+            ],
+            functions=[
+                Function(
+                    name="Main",
+                    is_exported=True,
+                    params=[],
+                    type=types.Placeholder(text="void"),
+                    body=[],
+                )
             ],
         ),
     )

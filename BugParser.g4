@@ -15,7 +15,7 @@ functionDef:
     ;
 
 data:
-    'export'? 'data' dataName '(' dataList ')'
+    'export'? 'data' dataName '(' dataList? ')'
         ('{' functionDef* '}') ?
     ;
 
