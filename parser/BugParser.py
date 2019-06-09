@@ -166,8 +166,8 @@ class BugParser ( Parser ):
                      "'function'", "'return'", "'void'", "'i32'", "'char'", 
                      "'boolean'", "'{'", "'}'", "'('", "')'", "'['", "']'", 
                      "'.'", "','", "';'", "'::'", "':'", "'->'", "'+'", 
-                     "'-'", "'*'", "'/'", "'&'", "'|'", "'<'", "'>'", "'=='", 
-                     "'='", "'~'", "<INVALID>", "<INVALID>", "<INVALID>", 
+                     "'-'", "'*'", "'/'", "'&&'", "'||'", "'<'", "'>'", 
+                     "'=='", "'='", "'~'", "<INVALID>", "<INVALID>", "<INVALID>", 
                      "<INVALID>", "<INVALID>", "'${'" ]
 
     symbolicNames = [ "<INVALID>", "IF", "ELSE", "FOR", "IN", "LET", "TRAIT", 
