@@ -469,6 +469,104 @@ def test_factorial():
     )
 
 
+def test_simple_predicates():
+    source = """
+        function isGreaterThan(left: i32, right: i32): boolean {
+            left > right;
+        }
+
+        function isLessThan(left: i32, right: i32): boolean {
+            left < right;
+        }
+
+        function and(left: boolean, right: boolean): boolean {
+            left && right;
+        }
+
+        function or(left: boolean, right: boolean): boolean {
+            left || right;
+        }
+     """
+    result = get_wasm(source)
+
+    assert_equal_modules(
+        result,
+        Module(
+            imports=[],
+            instructions=[
+                Func(
+                    name="$isGreaterThan",
+                    export=None,
+                    params=[
+                        Param(type="i32", name="$left"),
+                        Param(type="i32", name="$right"),
+                    ],
+                    locals=[],
+                    instructions=[
+                        BinaryOperation(
+                            op="i32.gt_s",
+                            left=GetLocal(name="$left"),
+                            right=GetLocal(name="$right"),
+                        )
+                    ],
+                    result=Result(type="i32"),
+                ),
+                Func(
+                    name="$isLessThan",
+                    export=None,
+                    params=[
+                        Param(type="i32", name="$left"),
+                        Param(type="i32", name="$right"),
+                    ],
+                    locals=[],
+                    instructions=[
+                        BinaryOperation(
+                            op="i32.lt_s",
+                            left=GetLocal(name="$left"),
+                            right=GetLocal(name="$right"),
+                        )
+                    ],
+                    result=Result(type="i32"),
+                ),
+                Func(
+                    name="$and",
+                    export=None,
+                    params=[
+                        Param(type="i32", name="$left"),
+                        Param(type="i32", name="$right"),
+                    ],
+                    locals=[],
+                    instructions=[
+                        BinaryOperation(
+                            op="i32.and",
+                            left=GetLocal(name="$left"),
+                            right=GetLocal(name="$right"),
+                        )
+                    ],
+                    result=Result(type="i32"),
+                ),
+                Func(
+                    name="$or",
+                    export=None,
+                    params=[
+                        Param(type="i32", name="$left"),
+                        Param(type="i32", name="$right"),
+                    ],
+                    locals=[],
+                    instructions=[
+                        BinaryOperation(
+                            op="i32.or",
+                            left=GetLocal(name="$left"),
+                            right=GetLocal(name="$right"),
+                        )
+                    ],
+                    result=Result(type="i32"),
+                ),
+            ],
+        ),
+    )
+
+
 def test_data_vector():
     source = """
         import System::Output;

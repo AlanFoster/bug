@@ -34,6 +34,10 @@ def get_binary_operator(op):
         return BinaryOperator.EQUALS
     elif op.type == BugParser.SUB:
         return BinaryOperator.SUBTRACT
+    elif op.type == BugParser.AND:
+        return BinaryOperator.AND
+    elif op.type == BugParser.OR:
+        return BinaryOperator.OR
     else:
         raise NotImplementedError(f"Binary operator '{op.text}' not implemented.")
 

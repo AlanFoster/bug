@@ -24,6 +24,8 @@ def as_language_type(type_: types.Type, symbol_table: SymbolTable) -> types.Type
         return types.I32()
     if text == "void":
         return types.Void()
+    if text == "boolean":
+        return types.Boolean()
     if symbol_table.has(text):
         symbol = symbol_table.get(text)
         assert symbol.type.is_data() or symbol.type.is_trait()
@@ -125,7 +127,9 @@ class DeclarationAnalysisVisitor(ast.AstVisitor):
         implements = []
         for implement in data.implements:
             implements.append(types.TypeRef(name=implement))
-        data_def_type = types.Data(name=data.name, implements=implements, fields=[], functions=[])
+        data_def_type = types.Data(
+            name=data.name, implements=implements, fields=[], functions=[]
+        )
         data.type = data_def_type
         self.symbol_table.add(
             Symbol(name=data.name, type=data_def_type, kind=SymbolKind.DATA)
