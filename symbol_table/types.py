@@ -6,6 +6,9 @@ class Type:
     def is_i32(self) -> bool:
         return False
 
+    def is_boolean(self) -> bool:
+        return False
+
     def is_trait(self) -> bool:
         return False
 
@@ -43,6 +46,12 @@ class Placeholder(Type):
 @dataclass
 class I32(Type):
     def is_i32(self) -> bool:
+        return True
+
+
+@dataclass
+class Boolean(Type):
+    def is_boolean(self) -> bool:
         return True
 
 

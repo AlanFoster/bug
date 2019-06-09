@@ -38,6 +38,10 @@ def get_binary_operator(operator):
         return "i32.eq"
     elif operator is ast.BinaryOperator.SUBTRACT:
         return "i32.sub"
+    elif operator is ast.BinaryOperator.AND:
+        return "i32.and"
+    elif operator is ast.BinaryOperator.OR:
+        return "i32.or"
     else:
         raise NotImplementedError(f"Binary operator '{operator}' not implemented.")
 
@@ -59,6 +63,9 @@ def as_wasm_type(type_: types.Type) -> Optional[str]:
         # If the required language type is a data ref, then we require a i32 pointer
         return "i32"
     elif type_.is_i32():
+        return "i32"
+    elif type_.is_boolean():
+        # 32 bit integers also serve as Booleans
         return "i32"
     elif type_.is_void():
         return None

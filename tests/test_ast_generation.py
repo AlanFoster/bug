@@ -98,6 +98,118 @@ def test_simple_expression():
     )
 
 
+def test_simple_predicates():
+    source = """
+        function isGreaterThan(left: i32, right: i32): boolean {
+            left > right;
+        }
+
+        function isLessThan(left: i32, right: i32): boolean {
+            left < right;
+        }
+
+        function and(left: boolean, right: boolean): boolean {
+            left && right;
+        }
+
+        function or(left: boolean, right: boolean): boolean {
+            left || right;
+        }
+     """
+    result = get_ast(source)
+
+    assert_equal_programs(
+        result,
+        compiler.ast.Program(
+            imports=[],
+            traits=[],
+            data_defs=[],
+            functions=[
+                compiler.ast.Function(
+                    name="isGreaterThan",
+                    is_exported=False,
+                    params=[
+                        compiler.ast.Param(
+                            name="left", type=types.Placeholder(text="i32")
+                        ),
+                        compiler.ast.Param(
+                            name="right", type=types.Placeholder(text="i32")
+                        ),
+                    ],
+                    type=types.Placeholder(text="boolean"),
+                    body=[
+                        compiler.ast.BinaryOperation(
+                            operator=compiler.ast.BinaryOperator.GREATER_THAN,
+                            left=compiler.ast.Variable(name="left"),
+                            right=compiler.ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+                compiler.ast.Function(
+                    name="isLessThan",
+                    is_exported=False,
+                    params=[
+                        compiler.ast.Param(
+                            name="left", type=types.Placeholder(text="i32")
+                        ),
+                        compiler.ast.Param(
+                            name="right", type=types.Placeholder(text="i32")
+                        ),
+                    ],
+                    type=types.Placeholder(text="boolean"),
+                    body=[
+                        compiler.ast.BinaryOperation(
+                            operator=compiler.ast.BinaryOperator.LESS_THAN,
+                            left=compiler.ast.Variable(name="left"),
+                            right=compiler.ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+                compiler.ast.Function(
+                    name="and",
+                    is_exported=False,
+                    params=[
+                        compiler.ast.Param(
+                            name="left", type=types.Placeholder(text="boolean")
+                        ),
+                        compiler.ast.Param(
+                            name="right", type=types.Placeholder(text="boolean")
+                        ),
+                    ],
+                    type=types.Placeholder(text="boolean"),
+                    body=[
+                        compiler.ast.BinaryOperation(
+                            operator=compiler.ast.BinaryOperator.AND,
+                            left=compiler.ast.Variable(name="left"),
+                            right=compiler.ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+                compiler.ast.Function(
+                    name="or",
+                    is_exported=False,
+                    params=[
+                        compiler.ast.Param(
+                            name="left", type=types.Placeholder(text="boolean")
+                        ),
+                        compiler.ast.Param(
+                            name="right", type=types.Placeholder(text="boolean")
+                        ),
+                    ],
+                    type=types.Placeholder(text="boolean"),
+                    body=[
+                        compiler.ast.BinaryOperation(
+                            operator=compiler.ast.BinaryOperator.OR,
+                            left=compiler.ast.Variable(name="left"),
+                            right=compiler.ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+            ],
+        ),
+    )
+
+
 def test_simple_assignment():
     source = """
         import System::Output;

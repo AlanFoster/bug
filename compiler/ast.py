@@ -26,6 +26,8 @@ class BinaryOperator(Enum):
     LESS_THAN = 4
     EQUALS = 5
     SUBTRACT = 6
+    AND = 7
+    OR = 8
 
 
 @dataclass

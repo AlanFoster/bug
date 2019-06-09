@@ -52,6 +52,152 @@ def test_simple_expression():
     )
 
 
+def test_simple_predicates():
+    source = """
+        function isGreaterThan(left: i32, right: i32): boolean {
+            left > right;
+        }
+
+        function isLessThan(left: i32, right: i32): boolean {
+            left < right;
+        }
+
+        function and(left: boolean, right: boolean): boolean {
+            left && right;
+        }
+
+        function or(left: boolean, right: boolean): boolean {
+            left || right;
+        }
+     """
+    result = get_semantic_analysis(source)
+
+    assert_equal_programs(
+        result,
+        ast.Program(
+            imports=[],
+            traits=[],
+            data_defs=[],
+            functions=[
+                ast.Function(
+                    name="isGreaterThan",
+                    is_exported=False,
+                    params=[
+                        ast.Param(
+                            name="left", type=types.Param(name="left", type=types.I32())
+                        ),
+                        ast.Param(
+                            name="right",
+                            type=types.Param(name="right", type=types.I32()),
+                        ),
+                    ],
+                    type=types.Function(
+                        name="isGreaterThan",
+                        params=[
+                            types.Param(name="left", type=types.I32()),
+                            types.Param(name="right", type=types.I32()),
+                        ],
+                        result=types.Boolean(),
+                    ),
+                    body=[
+                        ast.BinaryOperation(
+                            operator=ast.BinaryOperator.GREATER_THAN,
+                            left=ast.Variable(name="left"),
+                            right=ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+                ast.Function(
+                    name="isLessThan",
+                    is_exported=False,
+                    params=[
+                        ast.Param(
+                            name="left", type=types.Param(name="left", type=types.I32())
+                        ),
+                        ast.Param(
+                            name="right",
+                            type=types.Param(name="right", type=types.I32()),
+                        ),
+                    ],
+                    type=types.Function(
+                        name="isLessThan",
+                        params=[
+                            types.Param(name="left", type=types.I32()),
+                            types.Param(name="right", type=types.I32()),
+                        ],
+                        result=types.Boolean(),
+                    ),
+                    body=[
+                        ast.BinaryOperation(
+                            operator=ast.BinaryOperator.LESS_THAN,
+                            left=ast.Variable(name="left"),
+                            right=ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+                ast.Function(
+                    name="and",
+                    is_exported=False,
+                    params=[
+                        ast.Param(
+                            name="left",
+                            type=types.Param(name="left", type=types.Boolean()),
+                        ),
+                        ast.Param(
+                            name="right",
+                            type=types.Param(name="right", type=types.Boolean()),
+                        ),
+                    ],
+                    type=types.Function(
+                        name="and",
+                        params=[
+                            types.Param(name="left", type=types.Boolean()),
+                            types.Param(name="right", type=types.Boolean()),
+                        ],
+                        result=types.Boolean(),
+                    ),
+                    body=[
+                        ast.BinaryOperation(
+                            operator=ast.BinaryOperator.AND,
+                            left=ast.Variable(name="left"),
+                            right=ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+                ast.Function(
+                    name="or",
+                    is_exported=False,
+                    params=[
+                        ast.Param(
+                            name="left",
+                            type=types.Param(name="left", type=types.Boolean()),
+                        ),
+                        ast.Param(
+                            name="right",
+                            type=types.Param(name="right", type=types.Boolean()),
+                        ),
+                    ],
+                    type=types.Function(
+                        name="or",
+                        params=[
+                            types.Param(name="left", type=types.Boolean()),
+                            types.Param(name="right", type=types.Boolean()),
+                        ],
+                        result=types.Boolean(),
+                    ),
+                    body=[
+                        ast.BinaryOperation(
+                            operator=ast.BinaryOperator.OR,
+                            left=ast.Variable(name="left"),
+                            right=ast.Variable(name="right"),
+                        )
+                    ],
+                ),
+            ],
+        ),
+    )
+
+
 def test_data_vector_with_complex_function():
     source = """
         import System::Output;
@@ -466,7 +612,12 @@ def test_trait_with_multiple_implementations():
                             body=[ast.Number(value=0)],
                         ),
                     ],
-                    type=types.Data(name="EmptyList", implements=[types.TypeRef("List")], fields=[], functions=[]),
+                    type=types.Data(
+                        name="EmptyList",
+                        implements=[types.TypeRef("List")],
+                        fields=[],
+                        functions=[],
+                    ),
                 ),
                 ast.DataDef(
                     name="Cons",
