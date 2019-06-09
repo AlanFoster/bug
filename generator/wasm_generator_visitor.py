@@ -24,6 +24,10 @@ from wasm.model import (
     Load,
 )
 
+class GeneratorException(Exception):
+    """
+    An unexpected error occurred during code generation.
+    """
 
 def get_binary_operator(operator):
     if operator is ast.BinaryOperator.ADD:
@@ -48,6 +52,8 @@ def get_binary_operator(operator):
 
 # TODO: Add language support for type inference within the semantic analysis stage
 def infer_type(variable_name: str) -> types.Type:
+    if variable_name.startswith("person"):
+        return types.TypeRef(name="Person")
     if variable_name.startswith("tail"):
         return types.TypeRef(name="VectorArray")
     elif variable_name.startswith("vectorArray"):
@@ -317,14 +323,28 @@ class AstVisitor(ast.AstVisitor):
 
         return [constructor] + data_funcs
 
-    # TODO: Only works within self
+    # TODO: Only works on param access currently
     def visit_member_access(self, member: ast.MemberAccess):
         if not isinstance(member.value, ast.Variable):
             raise TypeError(f"No support added for {member} yet.")
 
-        target = member.value.name
-        target_symbol = self.symbol_table.get(target)
-        field_symbol = self.symbol_table.get(member.member)
+        left = member.value.name
+        right = member.member
+
+        left_param_symbol = self.symbol_table.get(left)
+        left_param_type = left_param_symbol.type
+        assert isinstance(left_param_type, types.Param)
+
+        left_type_ref = left_param_type.type
+        assert isinstance(left_type_ref, types.TypeRef)
+        left_type = self.symbol_table.get(left_type_ref.name).type
+        assert isinstance(left_type, types.Data)
+        right_field_index = None
+        for index, field in enumerate(left_type.fields):
+            if field.name == right:
+                right_field_index = index
+        if right_field_index is None:
+            raise GeneratorException(f"Unable to find find field_index for '{left}.{right}'")
 
         # Load from memory the required field by calculating its field number relative to its self pointer
         # field = self_pointer + (field_number * 4)
@@ -333,11 +353,11 @@ class AstVisitor(ast.AstVisitor):
             location=(
                 BinaryOperation(
                     op="i32.add",
-                    left=GetLocal(name=target_symbol.generated_name),
+                    left=GetLocal(name=left_param_symbol.generated_name),
                     right=(
                         BinaryOperation(
                             op="i32.mul",
-                            left=Const(type="i32", val=str(field_symbol.field_number)),
+                            left=Const(type="i32", val=str(right_field_index)),
                             right=Const(type="i32", val="4"),
                         )
                     ),

@@ -1586,3 +1586,83 @@ def test_data_vector_with_complex_function():
             ],
         ),
     )
+
+
+def test_simple_trait():
+    source = """
+        trait EqualAge {
+            function isEqualAge(self: EqualAge, age: i32): boolean;
+        }
+
+        data Person(age: i32) implements EqualAge {
+            function isEqualAge(self: Person, age: i32): boolean {
+                self.age == age;
+            }
+        }
+     """
+    result = get_wasm(source)
+
+    import prettyprinter; prettyprinter.pprint(result)
+
+    assert_equal_modules(
+        result,
+        Module(
+            imports=[],
+            instructions=[
+                Func(
+                    name='$Person.new',
+                    export=None,
+                    params=[Param(type='i32', name='$age')],
+                    locals=[],
+                    instructions=[
+                        SetGlobal(
+                            name='$self_pointer',
+                            val=Call(
+                                name='$malloc',
+                                arguments=[Const(type='i32', val='2')]
+                            )
+                        ),
+                        Store(
+                            type='i32',
+                            location=BinaryOperation(
+                                op='i32.add',
+                                left=GetGlobal(name='$self_pointer'),
+                                right=Const(type='i32', val='0')
+                            ),
+                            val=GetLocal(name='$age')
+                        ),
+                        GetGlobal(name='$self_pointer')
+                    ],
+                    result=Result(type='i32')
+                ),
+                Func(
+                    name='$Person.isEqualAge',
+                    export=None,
+                    params=[
+                        Param(type='i32', name='$self'),
+                        Param(type='i32', name='$age')
+                    ],
+                    locals=[],
+                    instructions=[
+                        BinaryOperation(
+                            op='i32.eq',
+                            left=Load(
+                                type='i32',
+                                location=BinaryOperation(
+                                    op='i32.add',
+                                    left=GetLocal(name='$self'),
+                                    right=BinaryOperation(
+                                        op='i32.mul',
+                                        left=Const(type='i32', val='0'),
+                                        right=Const(type='i32', val='4')
+                                    )
+                                )
+                            ),
+                            right=GetLocal(name='$age')
+                        )
+                    ],
+                    result=Result(type='i32')
+                )
+            ]
+        )
+    )
