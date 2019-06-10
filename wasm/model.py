@@ -66,9 +66,9 @@ class Func(Instruction):
     ( func (param i32) (param i32) (result f64) (local f64) (local i32) ... )
     Absence of result indicates no return value
 
-    Reference locals with `get_local 0`, `get_local 1`, or more readable:
+    Reference locals with `local.get 0`, `local.get 1`, or more readable:
     ( func (param $p1 i32) (param $p2 i32) (result f64) (local $a f64) (local $b i32) ... )
-    Reference locals with `get_local $p1`, `get_local $a`
+    Reference locals with `local.get $p1`, `local.get $a`
     """
 
     name: Optional[str]
@@ -94,20 +94,20 @@ class BinaryOperation(Instruction):
 
 
 @dataclass
-class GetLocal(Instruction):
+class LocalGet(Instruction):
     name: str
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visit_get_local(self)
+        return visitor.visit_local_get(self)
 
 
 @dataclass
-class SetLocal(Instruction):
+class LocalSet(Instruction):
     name: str
     val: Instruction
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visit_set_local(self)
+        return visitor.visit_local_set(self)
 
 
 @dataclass
@@ -169,20 +169,20 @@ class Global(Instruction):
 
 
 @dataclass
-class GetGlobal(Instruction):
+class GlobalGet(Instruction):
     name: str
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visit_get_global(self)
+        return visitor.visit_global_get(self)
 
 
 @dataclass
-class SetGlobal(Instruction):
+class GlobalSet(Instruction):
     name: str
     val: Instruction
 
     def accept(self, visitor: "WasmVisitor"):
-        return visitor.visit_set_global(self)
+        return visitor.visit_global_set(self)
 
 
 @dataclass
@@ -241,11 +241,11 @@ class WasmVisitor:
         raise NotImplementedError()
 
     @abstractmethod
-    def visit_get_local(self, param: GetLocal):
+    def visit_local_get(self, param: LocalGet):
         raise NotImplementedError()
 
     @abstractmethod
-    def visit_set_local(self, local: SetLocal):
+    def visit_local_set(self, local: LocalSet):
         raise NotImplementedError()
 
     @abstractmethod
@@ -289,11 +289,11 @@ class WasmVisitor:
         raise NotImplementedError()
 
     @abstractmethod
-    def visit_get_global(self, get_global: GetGlobal):
+    def visit_global_get(self, global_get: GlobalGet):
         raise NotImplementedError()
 
     @abstractmethod
-    def visit_set_global(self, set_global: SetGlobal):
+    def visit_global_set(self, global_set: GlobalSet):
         raise NotImplementedError()
 
     @abstractmethod

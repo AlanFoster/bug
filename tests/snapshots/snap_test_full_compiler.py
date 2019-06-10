@@ -25,7 +25,7 @@ snapshots['test_simple_expression 1'] = '''(module
             (i32.add
                 (i32.mul
                     (i32.const 4)
-                    (get_local $required_bytes)
+                    (local.get $required_bytes)
                 )
                 (global.get $heap_pointer)
             )
@@ -65,7 +65,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
             (i32.add
                 (i32.mul
                     (i32.const 4)
-                    (get_local $required_bytes)
+                    (local.get $required_bytes)
                 )
                 (global.get $heap_pointer)
             )
@@ -84,14 +84,14 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
                 (global.get $self_pointer)
                 (i32.const 0)
             )
-            (get_local $x)
+            (local.get $x)
         )
         (i32.store
             (i32.add
                 (global.get $self_pointer)
                 (i32.const 4)
             )
-            (get_local $y)
+            (local.get $y)
         )
         (global.get $self_pointer)
     )
@@ -102,7 +102,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
             (i32.add
                 (i32.load
                     (i32.add
-                        (get_local $self)
+                        (local.get $self)
                         (i32.mul
                             (i32.const 0)
                             (i32.const 4)
@@ -111,7 +111,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
                 )
                 (i32.load
                     (i32.add
-                        (get_local $other)
+                        (local.get $other)
                         (i32.mul
                             (i32.const 0)
                             (i32.const 4)
@@ -122,7 +122,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
             (i32.add
                 (i32.load
                     (i32.add
-                        (get_local $self)
+                        (local.get $self)
                         (i32.mul
                             (i32.const 1)
                             (i32.const 4)
@@ -131,7 +131,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
                 )
                 (i32.load
                     (i32.add
-                        (get_local $other)
+                        (local.get $other)
                         (i32.mul
                             (i32.const 1)
                             (i32.const 4)
@@ -145,7 +145,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
     (func $Vector.getX (param $self i32) (result i32)
         (i32.load
             (i32.add
-                (get_local $self)
+                (local.get $self)
                 (i32.mul
                     (i32.const 0)
                     (i32.const 4)
@@ -157,7 +157,7 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
     (func $Vector.getY (param $self i32) (result i32)
         (i32.load
             (i32.add
-                (get_local $self)
+                (local.get $self)
                 (i32.mul
                     (i32.const 1)
                     (i32.const 4)
@@ -170,39 +170,39 @@ snapshots['test_data_vector_with_complex_function 1'] = '''(module
         (local $vectorA i32)
         (local $vectorB i32)
         (local $vectorC i32)
-        (set_local $vectorA
+        (local.set $vectorA
             (call
                 $Vector.new
                 (i32.const 3)
                 (i32.const 6)
             )
         )
-        (set_local $vectorB
+        (local.set $vectorB
             (call
                 $Vector.new
                 (i32.const 5)
                 (i32.const 3)
             )
         )
-        (set_local $vectorC
+        (local.set $vectorC
             (call
                 $Vector.add
-                (get_local $vectorA)
-                (get_local $vectorB)
+                (local.get $vectorA)
+                (local.get $vectorB)
             )
         )
         (call
             $output_println
             (call
                 $Vector.getX
-                (get_local $vectorC)
+                (local.get $vectorC)
             )
         )
         (call
             $output_println
             (call
                 $Vector.getY
-                (get_local $vectorC)
+                (local.get $vectorC)
             )
         )
     )

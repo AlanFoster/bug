@@ -9,15 +9,15 @@ from wasm.model import (
     Result,
     Const,
     Local,
-    GetLocal,
-    SetLocal,
+    LocalGet,
+    LocalSet,
     If,
     Drop,
     Return,
     Nop,
     Memory,
-    GetGlobal,
-    SetGlobal,
+    GlobalGet,
+    GlobalSet,
     Global,
     Store,
     Load,
@@ -84,15 +84,15 @@ def test_function_call_with_params_and_locals(snapshot):
                 locals=[Local(type="i32", name="$answer")],
                 export=None,
                 instructions=[
-                    SetLocal(
+                    LocalSet(
                         name="$answer",
                         val=BinaryOperation(
                             op="i32.add",
-                            left=GetLocal(name="$a"),
-                            right=GetLocal(name="$b"),
+                            left=LocalGet(name="$a"),
+                            right=LocalGet(name="$b"),
                         ),
                     ),
-                    GetLocal(name="$answer"),
+                    LocalGet(name="$answer"),
                 ],
             ),
             Func(
@@ -102,14 +102,14 @@ def test_function_call_with_params_and_locals(snapshot):
                 locals=[Local(type="i32", name="$a"), Local(type="i32", name="$b")],
                 result=Result(type=None),
                 instructions=[
-                    SetLocal(name="$a", val=Const(type="i32", val="2")),
-                    SetLocal(name="$b", val=Const(type="i32", val="3")),
+                    LocalSet(name="$a", val=Const(type="i32", val="2")),
+                    LocalSet(name="$b", val=Const(type="i32", val="3")),
                     Call(
                         name="$output_println",
                         arguments=[
                             Call(
                                 name="$add",
-                                arguments=[GetLocal(name="$a"), GetLocal(name="$b")],
+                                arguments=[LocalGet(name="$a"), LocalGet(name="$b")],
                             )
                         ],
                     ),
@@ -266,17 +266,17 @@ def test_globals(snapshot):
                 result=Result(type="i32"),
                 export=None,
                 instructions=[
-                    SetGlobal(
+                    GlobalSet(
                         name="$count",
                         val=(
                             BinaryOperation(
                                 op="i32.add",
-                                left=GetGlobal(name="$count"),
+                                left=GlobalGet(name="$count"),
                                 right=Const(type="i32", val="1"),
                             )
                         ),
                     ),
-                    GetGlobal(name="$count"),
+                    GlobalGet(name="$count"),
                 ],
             ),
         ],

@@ -5,9 +5,9 @@ from wasm.model import (
     Func,
     Memory,
     Global,
-    GetGlobal,
-    GetLocal,
-    SetGlobal,
+    GlobalGet,
+    LocalGet,
+    GlobalSet,
     Instruction,
     BinaryOperation,
     Const,
@@ -44,8 +44,8 @@ def preamble() -> List[Instruction]:
         result=Result(type="i32"),
         export=None,
         instructions=[
-            GetGlobal(name="$heap_pointer"),
-            SetGlobal(
+            GlobalGet(name="$heap_pointer"),
+            GlobalSet(
                 name="$heap_pointer",
                 val=(
                     BinaryOperation(
@@ -54,10 +54,10 @@ def preamble() -> List[Instruction]:
                             BinaryOperation(
                                 op="i32.mul",
                                 left=(Const(type="i32", val="4")),
-                                right=GetLocal(name="$required_bytes"),
+                                right=LocalGet(name="$required_bytes"),
                             )
                         ),
-                        right=GetGlobal(name="$heap_pointer"),
+                        right=GlobalGet(name="$heap_pointer"),
                     )
                 ),
             ),

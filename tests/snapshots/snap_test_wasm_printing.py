@@ -45,30 +45,30 @@ snapshots['test_function_call_with_params_and_locals 1'] = '''(module
     (func $output_println (import "System::Output" "println") (param i32))
     (func $add (param $a i32) (param $b i32) (result i32)
         (local $answer i32)
-        (set_local $answer
+        (local.set $answer
             (i32.add
-                (get_local $a)
-                (get_local $b)
+                (local.get $a)
+                (local.get $b)
             )
         )
-        (get_local $answer)
+        (local.get $answer)
     )
 
     (func $Main (export "Main")
         (local $a i32)
         (local $b i32)
-        (set_local $a
+        (local.set $a
             (i32.const 2)
         )
-        (set_local $b
+        (local.set $b
             (i32.const 3)
         )
         (call
             $output_println
             (call
                 $add
-                (get_local $a)
-                (get_local $b)
+                (local.get $a)
+                (local.get $b)
             )
         )
     )

@@ -7,16 +7,16 @@ from .model import (
     Param,
     Const,
     Local,
-    SetLocal,
-    GetLocal,
+    LocalSet,
+    LocalGet,
     Result,
     If,
     Return,
     Drop,
     Nop,
     Memory,
-    SetGlobal,
-    GetGlobal,
+    GlobalSet,
+    GlobalGet,
     Global,
     Import,
     Store,
@@ -129,19 +129,19 @@ class WasmPrinter(WasmVisitor):
     def visit_local(self, local: Local):
         return self.with_indentation(f"(local {local.name} {local.type})")
 
-    def visit_set_local(self, set_local: SetLocal):
-        result = self.with_indentation(f"(set_local {set_local.name}") + "\n"
+    def visit_local_set(self, local_set: LocalSet):
+        result = self.with_indentation(f"(local.set {local_set.name}") + "\n"
 
         self.indentation += 1
-        result += set_local.val.accept(self)
+        result += local_set.val.accept(self)
         self.indentation -= 1
 
         result += self.with_indentation(")") + "\n"
 
         return result
 
-    def visit_get_local(self, get_local: GetLocal):
-        return self.with_indentation(f"(get_local {get_local.name})") + "\n"
+    def visit_local_get(self, local_get: LocalGet):
+        return self.with_indentation(f"(local.get {local_get.name})") + "\n"
 
     def visit_call(self, call: Call):
         result = self.with_indentation("(call\n")
@@ -215,14 +215,14 @@ class WasmPrinter(WasmVisitor):
 
         return result
 
-    def visit_get_global(self, get_global: GetGlobal):
-        return self.with_indentation(f"(global.get {get_global.name})") + "\n"
+    def visit_global_get(self, global_get: GlobalGet):
+        return self.with_indentation(f"(global.get {global_get.name})") + "\n"
 
-    def visit_set_global(self, set_global: SetGlobal):
-        result = self.with_indentation(f"(global.set {set_global.name}") + "\n"
+    def visit_global_set(self, global_set: GlobalSet):
+        result = self.with_indentation(f"(global.set {global_set.name}") + "\n"
 
         self.indentation += 1
-        result += set_global.val.accept(self)
+        result += global_set.val.accept(self)
         self.indentation -= 1
 
         result += self.with_indentation(")") + "\n"
