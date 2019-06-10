@@ -10,24 +10,26 @@ from wasm.model import (
     Call,
     Param,
     Const,
-    SetLocal,
-    GetLocal,
+    LocalSet,
+    LocalGet,
     Local,
     Result,
     If,
     Nop,
     Return,
     Import,
-    GetGlobal,
-    SetGlobal,
+    GlobalGet,
+    GlobalSet,
     Store,
     Load,
 )
+
 
 class GeneratorException(Exception):
     """
     An unexpected error occurred during code generation.
     """
+
 
 def get_binary_operator(operator):
     if operator is ast.BinaryOperator.ADD:
@@ -110,14 +112,14 @@ class AstVisitor(ast.AstVisitor):
 
     def visit_variable(self, variable: ast.Variable):
         symbol = self.symbol_table.get(variable.name)
-        return GetLocal(name=symbol.generated_name)
+        return LocalGet(name=symbol.generated_name)
 
     def visit_let(self, let: ast.Let):
         expression = let.value.accept(self)
         symbol = Symbol(name=let.name, type=infer_type(let.name), kind=SymbolKind.LOCAL)
         self.symbol_table.add(symbol)
 
-        return SetLocal(name=symbol.generated_name, val=expression)
+        return LocalSet(name=symbol.generated_name, val=expression)
 
     def visit_return(self, return_: ast.Return):
         return Return(expression=return_.value.accept(self) if return_.value else Nop())
@@ -151,7 +153,7 @@ class AstVisitor(ast.AstVisitor):
 
         # Additionally prepend the `self` argument to this function call
         if is_method_access:
-            arguments.append(GetLocal(name=target_symbol.generated_name))
+            arguments.append(LocalGet(name=target_symbol.generated_name))
         for argument in function_call.arguments:
             arguments.append(argument.accept(self))
 
@@ -260,7 +262,7 @@ class AstVisitor(ast.AstVisitor):
 
         # Specify all known functions
 
-        malloc_self = SetGlobal(
+        malloc_self = GlobalSet(
             name="$self_pointer",
             val=Call(name="$malloc", arguments=[Const(type="i32", val="2")]),
         )
@@ -278,15 +280,15 @@ class AstVisitor(ast.AstVisitor):
                     location=(
                         BinaryOperation(
                             op="i32.add",
-                            left=GetGlobal(name="$self_pointer"),
+                            left=GlobalGet(name="$self_pointer"),
                             right=Const(type="i32", val=str(4 * index)),
                         )
                     ),
-                    val=GetLocal(name=f"${param.name}"),
+                    val=LocalGet(name=f"${param.name}"),
                 )
             )
 
-        return_self = GetGlobal(name="$self_pointer")
+        return_self = GlobalGet(name="$self_pointer")
 
         instructions = []
         instructions += [malloc_self]
@@ -344,7 +346,9 @@ class AstVisitor(ast.AstVisitor):
             if field.name == right:
                 right_field_index = index
         if right_field_index is None:
-            raise GeneratorException(f"Unable to find find field_index for '{left}.{right}'")
+            raise GeneratorException(
+                f"Unable to find find field_index for '{left}.{right}'"
+            )
 
         # Load from memory the required field by calculating its field number relative to its self pointer
         # field = self_pointer + (field_number * 4)
@@ -353,7 +357,7 @@ class AstVisitor(ast.AstVisitor):
             location=(
                 BinaryOperation(
                     op="i32.add",
-                    left=GetLocal(name=left_param_symbol.generated_name),
+                    left=LocalGet(name=left_param_symbol.generated_name),
                     right=(
                         BinaryOperation(
                             op="i32.mul",

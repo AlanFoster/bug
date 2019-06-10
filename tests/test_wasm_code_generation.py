@@ -10,14 +10,14 @@ from wasm.model import (
     Param,
     Const,
     Local,
-    SetLocal,
-    GetLocal,
+    LocalSet,
+    LocalGet,
     Result,
     If,
     Return,
     Import,
-    SetGlobal,
-    GetGlobal,
+    GlobalSet,
+    GlobalGet,
     Store,
     Load,
 )
@@ -119,15 +119,15 @@ def test_simple_assignment():
                     locals=[Local(type="i32", name="$a"), Local(type="i32", name="$b")],
                     result=Result(type=None),
                     instructions=[
-                        SetLocal(name="$a", val=Const(type="i32", val="5")),
-                        SetLocal(name="$b", val=Const(type="i32", val="10")),
+                        LocalSet(name="$a", val=Const(type="i32", val="5")),
+                        LocalSet(name="$b", val=Const(type="i32", val="10")),
                         Call(
                             name="$output_println",
                             arguments=[
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetLocal(name="$a"),
-                                    right=GetLocal(name="$b"),
+                                    left=LocalGet(name="$a"),
+                                    right=LocalGet(name="$b"),
                                 )
                             ],
                         ),
@@ -225,8 +225,8 @@ def test_function_call_with_arguments():
                     instructions=[
                         BinaryOperation(
                             op="i32.add",
-                            left=GetLocal(name="$x"),
-                            right=GetLocal(name="$y"),
+                            left=LocalGet(name="$x"),
+                            right=LocalGet(name="$y"),
                         )
                     ],
                 ),
@@ -412,7 +412,7 @@ def test_factorial():
                         If(
                             condition=BinaryOperation(
                                 op="i32.eq",
-                                left=GetLocal(name="$n"),
+                                left=LocalGet(name="$n"),
                                 right=Const(type="i32", val="1"),
                             ),
                             result=Result(type=None),
@@ -424,14 +424,14 @@ def test_factorial():
                                     expression=(
                                         BinaryOperation(
                                             op="i32.mul",
-                                            left=GetLocal(name="$n"),
+                                            left=LocalGet(name="$n"),
                                             right=(
                                                 Call(
                                                     name="$factorial",
                                                     arguments=[
                                                         BinaryOperation(
                                                             op="i32.sub",
-                                                            left=GetLocal(name="$n"),
+                                                            left=LocalGet(name="$n"),
                                                             right=Const(
                                                                 type="i32", val="1"
                                                             ),
@@ -505,8 +505,8 @@ def test_simple_predicates():
                     instructions=[
                         BinaryOperation(
                             op="i32.gt_s",
-                            left=GetLocal(name="$left"),
-                            right=GetLocal(name="$right"),
+                            left=LocalGet(name="$left"),
+                            right=LocalGet(name="$right"),
                         )
                     ],
                     result=Result(type="i32"),
@@ -522,8 +522,8 @@ def test_simple_predicates():
                     instructions=[
                         BinaryOperation(
                             op="i32.lt_s",
-                            left=GetLocal(name="$left"),
-                            right=GetLocal(name="$right"),
+                            left=LocalGet(name="$left"),
+                            right=LocalGet(name="$right"),
                         )
                     ],
                     result=Result(type="i32"),
@@ -539,8 +539,8 @@ def test_simple_predicates():
                     instructions=[
                         BinaryOperation(
                             op="i32.and",
-                            left=GetLocal(name="$left"),
-                            right=GetLocal(name="$right"),
+                            left=LocalGet(name="$left"),
+                            right=LocalGet(name="$right"),
                         )
                     ],
                     result=Result(type="i32"),
@@ -556,8 +556,8 @@ def test_simple_predicates():
                     instructions=[
                         BinaryOperation(
                             op="i32.or",
-                            left=GetLocal(name="$left"),
-                            right=GetLocal(name="$right"),
+                            left=LocalGet(name="$left"),
+                            right=LocalGet(name="$right"),
                         )
                     ],
                     result=Result(type="i32"),
@@ -598,7 +598,7 @@ def test_data_vector():
                     result=Result(type="i32"),
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -608,21 +608,21 @@ def test_data_vector():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetGlobal(name="$self_pointer"),
+                                left=GlobalGet(name="$self_pointer"),
                                 right=Const(type="i32", val="0"),
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetGlobal(name="$self_pointer"),
+                                left=GlobalGet(name="$self_pointer"),
                                 right=Const(type="i32", val="4"),
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -669,7 +669,7 @@ def test_data_vector_constructor():
                     params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
                     result=Result(type="i32"),
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -680,24 +680,24 @@ def test_data_vector_constructor():
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="0"),
                                 )
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="4"),
                                 )
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -707,7 +707,7 @@ def test_data_vector_constructor():
                     params=[],
                     locals=[Local(type="i32", name="$vector")],
                     instructions=[
-                        SetLocal(
+                        LocalSet(
                             name="$vector",
                             val=Call(
                                 name="$Vector.new",
@@ -759,7 +759,7 @@ def test_data_vector_with_simple_function():
                     result=Result(type="i32"),
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -770,24 +770,24 @@ def test_data_vector_with_simple_function():
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="0"),
                                 )
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="4"),
                                 )
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -847,7 +847,7 @@ def test_data_vector_with_simple_function_call():
                     result=Result(type="i32"),
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -858,24 +858,24 @@ def test_data_vector_with_simple_function_call():
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="0"),
                                 )
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="4"),
                                 )
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -893,7 +893,7 @@ def test_data_vector_with_simple_function_call():
                     locals=[Local(type="i32", name="$vector")],
                     result=Result(type=None),
                     instructions=[
-                        SetLocal(
+                        LocalSet(
                             name="$vector",
                             val=Call(
                                 name="$Vector.new",
@@ -908,7 +908,7 @@ def test_data_vector_with_simple_function_call():
                             arguments=[
                                 Call(
                                     name="$Vector.length",
-                                    arguments=[GetLocal(name="$vector")],
+                                    arguments=[LocalGet(name="$vector")],
                                 )
                             ],
                         ),
@@ -955,7 +955,7 @@ def test_data_vector_with_self_getter_method():
                     result=Result(type="i32"),
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -966,24 +966,24 @@ def test_data_vector_with_self_getter_method():
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="0"),
                                 )
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="4"),
                                 )
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -997,7 +997,7 @@ def test_data_vector_with_self_getter_method():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetLocal("$self"),
+                                left=LocalGet("$self"),
                                 right=BinaryOperation(
                                     op="i32.mul",
                                     left=Const(type="i32", val="0"),
@@ -1014,7 +1014,7 @@ def test_data_vector_with_self_getter_method():
                     locals=[Local(name="$vector", type="i32")],
                     result=Result(type=None),
                     instructions=[
-                        SetLocal(
+                        LocalSet(
                             name="$vector",
                             val=Call(
                                 name="$Vector.new",
@@ -1029,7 +1029,7 @@ def test_data_vector_with_self_getter_method():
                             arguments=[
                                 Call(
                                     name="$Vector.getX",
-                                    arguments=[GetLocal(name="$vector")],
+                                    arguments=[LocalGet(name="$vector")],
                                 )
                             ],
                         ),
@@ -1081,7 +1081,7 @@ def test_data_vector_with_self_getter_methods():
                     result=Result(type="i32"),
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -1092,24 +1092,24 @@ def test_data_vector_with_self_getter_methods():
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="0"),
                                 )
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="4"),
                                 )
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -1123,7 +1123,7 @@ def test_data_vector_with_self_getter_methods():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetLocal("$self"),
+                                left=LocalGet("$self"),
                                 right=BinaryOperation(
                                     op="i32.mul",
                                     left=Const(type="i32", val="0"),
@@ -1144,7 +1144,7 @@ def test_data_vector_with_self_getter_methods():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetLocal("$self"),
+                                left=LocalGet("$self"),
                                 right=BinaryOperation(
                                     op="i32.mul",
                                     left=Const(type="i32", val="1"),
@@ -1161,7 +1161,7 @@ def test_data_vector_with_self_getter_methods():
                     locals=[Local(name="$vector", type="i32")],
                     result=Result(type=None),
                     instructions=[
-                        SetLocal(
+                        LocalSet(
                             name="$vector",
                             val=Call(
                                 name="$Vector.new",
@@ -1176,7 +1176,7 @@ def test_data_vector_with_self_getter_methods():
                             arguments=[
                                 Call(
                                     name="$Vector.getX",
-                                    arguments=[GetLocal(name="$vector")],
+                                    arguments=[LocalGet(name="$vector")],
                                 )
                             ],
                         ),
@@ -1185,7 +1185,7 @@ def test_data_vector_with_self_getter_methods():
                             arguments=[
                                 Call(
                                     name="$Vector.getY",
-                                    arguments=[GetLocal(name="$vector")],
+                                    arguments=[LocalGet(name="$vector")],
                                 )
                             ],
                         ),
@@ -1232,7 +1232,7 @@ def test_data_vector_with_math():
                     result=Result(type="i32"),
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -1243,24 +1243,24 @@ def test_data_vector_with_math():
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="0"),
                                 )
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=(
                                 BinaryOperation(
                                     op="i32.add",
-                                    left=GetGlobal(name="$self_pointer"),
+                                    left=GlobalGet(name="$self_pointer"),
                                     right=Const(type="i32", val="4"),
                                 )
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                 ),
                 Func(
@@ -1276,7 +1276,7 @@ def test_data_vector_with_math():
                                 type="i32",
                                 location=BinaryOperation(
                                     op="i32.add",
-                                    left=GetLocal("$self"),
+                                    left=LocalGet("$self"),
                                     right=BinaryOperation(
                                         op="i32.mul",
                                         left=Const(type="i32", val="1"),
@@ -1288,7 +1288,7 @@ def test_data_vector_with_math():
                                 type="i32",
                                 location=BinaryOperation(
                                     op="i32.add",
-                                    left=GetLocal("$self"),
+                                    left=LocalGet("$self"),
                                     right=BinaryOperation(
                                         op="i32.mul",
                                         left=Const(type="i32", val="1"),
@@ -1306,7 +1306,7 @@ def test_data_vector_with_math():
                     locals=[Local(name="$vector", type="i32")],
                     result=Result(type=None),
                     instructions=[
-                        SetLocal(
+                        LocalSet(
                             name="$vector",
                             val=Call(
                                 name="$Vector.new",
@@ -1321,7 +1321,7 @@ def test_data_vector_with_math():
                             arguments=[
                                 Call(
                                     name="$Vector.getDoubleY",
-                                    arguments=[GetLocal(name="$vector")],
+                                    arguments=[LocalGet(name="$vector")],
                                 )
                             ],
                         ),
@@ -1381,7 +1381,7 @@ def test_data_vector_with_complex_function():
                     params=[Param(type="i32", name="$x"), Param(type="i32", name="$y")],
                     locals=[],
                     instructions=[
-                        SetGlobal(
+                        GlobalSet(
                             name="$self_pointer",
                             val=Call(
                                 name="$malloc", arguments=[Const(type="i32", val="2")]
@@ -1391,21 +1391,21 @@ def test_data_vector_with_complex_function():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetGlobal(name="$self_pointer"),
+                                left=GlobalGet(name="$self_pointer"),
                                 right=Const(type="i32", val="0"),
                             ),
-                            val=GetLocal(name="$x"),
+                            val=LocalGet(name="$x"),
                         ),
                         Store(
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetGlobal(name="$self_pointer"),
+                                left=GlobalGet(name="$self_pointer"),
                                 right=Const(type="i32", val="4"),
                             ),
-                            val=GetLocal(name="$y"),
+                            val=LocalGet(name="$y"),
                         ),
-                        GetGlobal(name="$self_pointer"),
+                        GlobalGet(name="$self_pointer"),
                     ],
                     result=Result(type="i32"),
                 ),
@@ -1427,7 +1427,7 @@ def test_data_vector_with_complex_function():
                                         type="i32",
                                         location=BinaryOperation(
                                             op="i32.add",
-                                            left=GetLocal(name="$self"),
+                                            left=LocalGet(name="$self"),
                                             right=BinaryOperation(
                                                 op="i32.mul",
                                                 left=Const(type="i32", val="0"),
@@ -1439,7 +1439,7 @@ def test_data_vector_with_complex_function():
                                         type="i32",
                                         location=BinaryOperation(
                                             op="i32.add",
-                                            left=GetLocal(name="$other"),
+                                            left=LocalGet(name="$other"),
                                             right=BinaryOperation(
                                                 op="i32.mul",
                                                 left=Const(type="i32", val="0"),
@@ -1454,7 +1454,7 @@ def test_data_vector_with_complex_function():
                                         type="i32",
                                         location=BinaryOperation(
                                             op="i32.add",
-                                            left=GetLocal(name="$self"),
+                                            left=LocalGet(name="$self"),
                                             right=BinaryOperation(
                                                 op="i32.mul",
                                                 left=Const(type="i32", val="1"),
@@ -1466,7 +1466,7 @@ def test_data_vector_with_complex_function():
                                         type="i32",
                                         location=BinaryOperation(
                                             op="i32.add",
-                                            left=GetLocal(name="$other"),
+                                            left=LocalGet(name="$other"),
                                             right=BinaryOperation(
                                                 op="i32.mul",
                                                 left=Const(type="i32", val="1"),
@@ -1490,7 +1490,7 @@ def test_data_vector_with_complex_function():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetLocal(name="$self"),
+                                left=LocalGet(name="$self"),
                                 right=BinaryOperation(
                                     op="i32.mul",
                                     left=Const(type="i32", val="0"),
@@ -1511,7 +1511,7 @@ def test_data_vector_with_complex_function():
                             type="i32",
                             location=BinaryOperation(
                                 op="i32.add",
-                                left=GetLocal(name="$self"),
+                                left=LocalGet(name="$self"),
                                 right=BinaryOperation(
                                     op="i32.mul",
                                     left=Const(type="i32", val="1"),
@@ -1532,7 +1532,7 @@ def test_data_vector_with_complex_function():
                         Local(type="i32", name="$vectorC"),
                     ],
                     instructions=[
-                        SetLocal(
+                        LocalSet(
                             name="$vectorA",
                             val=Call(
                                 name="$Vector.new",
@@ -1542,7 +1542,7 @@ def test_data_vector_with_complex_function():
                                 ],
                             ),
                         ),
-                        SetLocal(
+                        LocalSet(
                             name="$vectorB",
                             val=Call(
                                 name="$Vector.new",
@@ -1552,13 +1552,13 @@ def test_data_vector_with_complex_function():
                                 ],
                             ),
                         ),
-                        SetLocal(
+                        LocalSet(
                             name="$vectorC",
                             val=Call(
                                 name="$Vector.add",
                                 arguments=[
-                                    GetLocal(name="$vectorA"),
-                                    GetLocal(name="$vectorB"),
+                                    LocalGet(name="$vectorA"),
+                                    LocalGet(name="$vectorB"),
                                 ],
                             ),
                         ),
@@ -1567,7 +1567,7 @@ def test_data_vector_with_complex_function():
                             arguments=[
                                 Call(
                                     name="$Vector.getX",
-                                    arguments=[GetLocal(name="$vectorC")],
+                                    arguments=[LocalGet(name="$vectorC")],
                                 )
                             ],
                         ),
@@ -1576,7 +1576,7 @@ def test_data_vector_with_complex_function():
                             arguments=[
                                 Call(
                                     name="$Vector.getY",
-                                    arguments=[GetLocal(name="$vectorC")],
+                                    arguments=[LocalGet(name="$vectorC")],
                                 )
                             ],
                         ),
@@ -1602,7 +1602,9 @@ def test_simple_trait():
      """
     result = get_wasm(source)
 
-    import prettyprinter; prettyprinter.pprint(result)
+    import prettyprinter
+
+    prettyprinter.pprint(result)
 
     assert_equal_modules(
         result,
@@ -1610,59 +1612,58 @@ def test_simple_trait():
             imports=[],
             instructions=[
                 Func(
-                    name='$Person.new',
+                    name="$Person.new",
                     export=None,
-                    params=[Param(type='i32', name='$age')],
+                    params=[Param(type="i32", name="$age")],
                     locals=[],
                     instructions=[
-                        SetGlobal(
-                            name='$self_pointer',
+                        GlobalSet(
+                            name="$self_pointer",
                             val=Call(
-                                name='$malloc',
-                                arguments=[Const(type='i32', val='2')]
-                            )
+                                name="$malloc", arguments=[Const(type="i32", val="2")]
+                            ),
                         ),
                         Store(
-                            type='i32',
+                            type="i32",
                             location=BinaryOperation(
-                                op='i32.add',
-                                left=GetGlobal(name='$self_pointer'),
-                                right=Const(type='i32', val='0')
+                                op="i32.add",
+                                left=GlobalGet(name="$self_pointer"),
+                                right=Const(type="i32", val="0"),
                             ),
-                            val=GetLocal(name='$age')
+                            val=LocalGet(name="$age"),
                         ),
-                        GetGlobal(name='$self_pointer')
+                        GlobalGet(name="$self_pointer"),
                     ],
-                    result=Result(type='i32')
+                    result=Result(type="i32"),
                 ),
                 Func(
-                    name='$Person.isEqualAge',
+                    name="$Person.isEqualAge",
                     export=None,
                     params=[
-                        Param(type='i32', name='$self'),
-                        Param(type='i32', name='$age')
+                        Param(type="i32", name="$self"),
+                        Param(type="i32", name="$age"),
                     ],
                     locals=[],
                     instructions=[
                         BinaryOperation(
-                            op='i32.eq',
+                            op="i32.eq",
                             left=Load(
-                                type='i32',
+                                type="i32",
                                 location=BinaryOperation(
-                                    op='i32.add',
-                                    left=GetLocal(name='$self'),
+                                    op="i32.add",
+                                    left=LocalGet(name="$self"),
                                     right=BinaryOperation(
-                                        op='i32.mul',
-                                        left=Const(type='i32', val='0'),
-                                        right=Const(type='i32', val='4')
-                                    )
-                                )
+                                        op="i32.mul",
+                                        left=Const(type="i32", val="0"),
+                                        right=Const(type="i32", val="4"),
+                                    ),
+                                ),
                             ),
-                            right=GetLocal(name='$age')
+                            right=LocalGet(name="$age"),
                         )
                     ],
-                    result=Result(type='i32')
-                )
-            ]
-        )
+                    result=Result(type="i32"),
+                ),
+            ],
+        ),
     )
