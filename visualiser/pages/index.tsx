@@ -1,36 +1,75 @@
-import React from 'react';
-import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
-import MuiLink from '@material-ui/core/Link';
-import ProTip from '../src/components/ProTip';
-import Link from '../src/components/Link';
+import React, { useRef } from 'react';
+import {makeStyles} from '@material-ui/core/styles';
+import {Box} from "@material-ui/core";
+import {CodeEditor} from "../src/components/code-editor";
+import {useHorizontalDrag} from "../src/components/use-horizontal-drag";
+import {Memory} from "../src/components/memory";
+import {Console} from "../src/components/console";
+import {Resizer} from "../src/components/resizer";
+import {Panel} from "../src/components/panel";
 
-function MadeWithLove() {
-  return (
-      <Typography variant="body2" color="textSecondary" align="center">
-        {'Built with love by the '}
-        <MuiLink color="inherit" href="https://material-ui.com/">
-          Material-UI
-        </MuiLink>
-        {' team.'}
-      </Typography>
-  );
-}
+const useStyles = makeStyles(theme => ({
+    root: {
+        display: 'flex',
+        flexGrow: 1,
+        height: '100vh'
+    },
+    runtimePanelWrapper: {
+        flex: 1
+    },
+    primaryPanel: {
+        flex: 1
+    },
+}));
 
-export default function Index() {
-  return (
-      <Container maxWidth="sm">
-        <Box my={4}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Next.js v4-beta example
-          </Typography>
-          <Link href="/about" color="secondary">
-            Go to the about page
-          </Link>
-          <ProTip />
-          <MadeWithLove />
+const CodeActions = function () {
+    return (
+        <React.Fragment>
+            Actions
+        </React.Fragment>
+    )
+};
+
+export default function Visualiser() {
+    const classes = useStyles();
+    const ref = useRef<Element>(null);
+    const { width: codePanelWidth, setDragging } = useHorizontalDrag(
+        ref
+    );
+
+    return (
+        <Box className={classes.root} ref={ref}>
+            <Box
+                width={
+                    typeof codePanelWidth !== 'undefined'
+                        ? `${Math.max(codePanelWidth, 300)}px`
+                        : '50%'
+                }
+            >
+                <Panel container>
+                    <Panel item className={classes.primaryPanel}>
+                        <CodeEditor/>
+                    </Panel>
+                    <Panel item>
+                        <CodeActions/>
+                    </Panel>
+                </Panel>
+            </Box>
+
+            <Resizer
+                onMouseDown={() => setDragging(true)}
+            />
+
+            <Box className={classes.runtimePanelWrapper}>
+                <Panel container>
+                    <Panel item className={classes.primaryPanel}>
+                        <Memory/>
+                    </Panel>
+                    <Panel item>
+                        <Console/>
+                    </Panel>
+                </Panel>
+            </Box>
         </Box>
-      </Container>
-  );
+    );
 }

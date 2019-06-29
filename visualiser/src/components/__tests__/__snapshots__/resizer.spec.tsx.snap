@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Resizer renders successfully 1`] = `
+<div
+  className="MuiBox-root MuiBox-root-4 makeStyles-root-1"
+  onMouseDown={[Function]}
+>
+  <div
+    className="MuiBox-root MuiBox-root-5 makeStyles-handle-2"
+  />
+</div>
+`;
