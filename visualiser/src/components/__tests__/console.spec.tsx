@@ -4,7 +4,7 @@ import { Console } from '../console';
 
 describe("Console", function () {
     it("renders successfully", function () {
-        const tree = renderer.create(<Console />);
+        const tree = renderer.create(<Console/>);
 
         expect(tree).toMatchSnapshot();
     });

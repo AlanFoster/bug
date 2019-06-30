@@ -1,10 +1,10 @@
 import * as React from "react";
 import renderer from "react-test-renderer"
-import { Memory } from '../memory';
+import { Visualiser } from "../visualiser";
 
-describe("Memory", function () {
+describe("Index", function () {
     it("renders successfully", function () {
-        const tree = renderer.create(<Memory/>);
+        const tree = renderer.create(<Visualiser/>);
 
         expect(tree).toMatchSnapshot();
     });

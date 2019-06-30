@@ -1,7 +1,4 @@
-import {RefObject, useEffect, useState} from 'react';
-
-
-let count = 0;
+import { RefObject, useEffect, useState } from 'react';
 
 export const useHorizontalDrag = function (ref?: RefObject<Element>, initialWidth?: number) {
     const [width, setWidth] = useState(initialWidth);
@@ -32,5 +29,5 @@ export const useHorizontalDrag = function (ref?: RefObject<Element>, initialWidt
         }
     }, [ref, isDragging]);
 
-    return { width, setDragging };
+    return {width, setDragging};
 };

@@ -4,7 +4,7 @@ import { CodeEditor } from '../code-editor';
 
 describe("CodeEditor", function () {
     it("renders successfully", function () {
-        const tree = renderer.create(<CodeEditor />);
+        const tree = renderer.create(<CodeEditor/>);
 
         expect(tree).toMatchSnapshot();
     });
