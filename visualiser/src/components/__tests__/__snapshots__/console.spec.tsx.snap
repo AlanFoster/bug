@@ -1,3 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Console renders successfully 1`] = `"Console"`;
+exports[`Console renders successfully with no logs 1`] = `
+<div>
+  <div>
+    Console (
+    0
+     logs)
+  </div>
+  <pre />
+</div>
+`;
+
+exports[`Console renders successfully with no logs present 1`] = `
+<div>
+  <div>
+    Console (
+    1
+     logs)
+  </div>
+  <pre>
+    <div>
+      hello world
+
+    </div>
+  </pre>
+</div>
+`;

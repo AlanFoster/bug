@@ -1,3 +1,33 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Memory renders successfully 1`] = `"Memory"`;
+exports[`Memory renders successfully when there is memory 1`] = `
+<div
+  className="makeStyles-root-1"
+>
+  <div>
+    Memory
+  </div>
+  <pre
+    className="makeStyles-memoryDump-2"
+  >
+    0 | 1 2 3 4
+4 | 4 3 2 1
+
+  </pre>
+</div>
+`;
+
+exports[`Memory renders successfully when there is no memory 1`] = `
+<div
+  className="makeStyles-root-1"
+>
+  <div>
+    Memory
+  </div>
+  <pre
+    className="makeStyles-memoryDump-2"
+  >
+    
+  </pre>
+</div>
+`;

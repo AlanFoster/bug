@@ -1,6 +1,6 @@
 import * as React from "react";
-import {makeStyles} from '@material-ui/core/styles';
-import {Box} from "@material-ui/core";
+import { makeStyles } from '@material-ui/core/styles';
+import { Box } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -9,8 +9,7 @@ const useStyles = makeStyles(theme => ({
         userSelect: 'none'
     },
     handle: {
-        backgroundColor: 'red',
-        width: 5,
+        width: 2,
         height: '100%'
     }
 }));
@@ -19,7 +18,7 @@ interface Props {
     readonly onMouseDown: React.MouseEventHandler;
 }
 
-export const Resizer: React.FC<Props> = function ({ onMouseDown }) {
+export const Resizer: React.FC<Props> = function ({onMouseDown}) {
     const classes = useStyles();
 
     return (

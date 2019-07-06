@@ -1,9 +1,18 @@
 import * as React from "react";
 
-export const Console = function () {
+interface Props {
+    readonly logs: string[];
+}
+
+export const Console: React.FC<Props> = function ({logs}) {
     return (
-        <React.Fragment>
-            Console
-        </React.Fragment>
+        <div>
+            <div>Console ({logs.length} logs)</div>
+            <pre>
+                {logs.map(function (log, index) {
+                    return <div key={index}>{log}</div>
+                })}
+            </pre>
+        </div>
     )
 };

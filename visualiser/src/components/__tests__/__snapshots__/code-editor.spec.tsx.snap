@@ -1,3 +1,211 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CodeEditor renders successfully 1`] = `"Code"`;
+exports[`CodeEditor renders successfully 1`] = `
+<div
+  style={
+    Object {
+      "boxSizing": "border-box",
+      "fontFamily": "\\"Fira code\\", \\"Fira Mono\\", monospace",
+      "overflow": "hidden",
+      "padding": 0,
+      "position": "relative",
+      "textAlign": "left",
+    }
+  }
+>
+  <textarea
+    autoCapitalize="off"
+    autoComplete="off"
+    autoCorrect="off"
+    className="npm__react-simple-code-editor__textarea"
+    data-gramm={false}
+    onChange={[Function]}
+    onKeyDown={[Function]}
+    spellCheck={false}
+    style={
+      Object {
+        "MozOsxFontSmoothing": "grayscale",
+        "WebkitFontSmoothing": "antialiased",
+        "WebkitTextFillColor": "transparent",
+        "background": "none",
+        "border": 0,
+        "boxSizing": "inherit",
+        "color": "inherit",
+        "display": "inherit",
+        "fontFamily": "inherit",
+        "fontSize": "inherit",
+        "fontStyle": "inherit",
+        "fontVariantLigatures": "inherit",
+        "fontWeight": "inherit",
+        "height": "100%",
+        "left": 0,
+        "letterSpacing": "inherit",
+        "lineHeight": "inherit",
+        "margin": 0,
+        "overflow": "hidden",
+        "overflowWrap": "break-word",
+        "paddingBottom": 0,
+        "paddingLeft": 0,
+        "paddingRight": 0,
+        "paddingTop": 0,
+        "position": "absolute",
+        "resize": "none",
+        "tabSize": "inherit",
+        "textIndent": "inherit",
+        "textRendering": "inherit",
+        "textTransform": "inherit",
+        "top": 0,
+        "whiteSpace": "pre-wrap",
+        "width": "100%",
+        "wordBreak": "keep-all",
+      }
+    }
+    value="(module
+    (func $output_println (import \\"System::Output\\" \\"println\\") (param i32))
+    (func $Foo (result i32)
+        (if
+            (i32.lt_s
+                (i32.const 9)
+                (i32.const 10)
+            )
+            (then
+                (call
+                    $output_println
+                    (i32.const 1)
+                )
+            )
+        )
+        (if
+            (result i32)
+            (i32.gt_s
+                (i32.const 9)
+                (i32.const 10)
+            )
+            (then
+                (i32.const 1)
+            )
+            (else
+                (i32.const 0)
+            )
+        )
+    )
+
+    (func $Main (export \\"Main\\")
+        (call
+            $Foo
+        )
+        (drop)
+    )
+)
+"
+  />
+  <pre
+    aria-hidden="true"
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "<span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">module</span>
+    <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">func</span> <span class=\\"token variable\\">$output_println</span> <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">import</span> <span class=\\"token string\\">\\"System::Output\\"</span> <span class=\\"token string\\">\\"println\\"</span><span class=\\"token punctuation\\">)</span> <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">param</span> <span class=\\"token keyword\\">i32</span><span class=\\"token punctuation\\">)</span><span class=\\"token punctuation\\">)</span>
+    <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">func</span> <span class=\\"token variable\\">$Foo</span> <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">result</span> <span class=\\"token keyword\\">i32</span><span class=\\"token punctuation\\">)</span>
+        <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">if</span>
+            <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>lt_s</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">9</span><span class=\\"token punctuation\\">)</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">10</span><span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">then</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">call</span>
+                    <span class=\\"token variable\\">$output_println</span>
+                    <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">1</span><span class=\\"token punctuation\\">)</span>
+                <span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">)</span>
+        <span class=\\"token punctuation\\">)</span>
+        <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">if</span>
+            <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">result</span> <span class=\\"token keyword\\">i32</span><span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>gt_s</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">9</span><span class=\\"token punctuation\\">)</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">10</span><span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">then</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">1</span><span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">else</span>
+                <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">i32<span class=\\"token punctuation\\">.</span>const</span> <span class=\\"token number\\">0</span><span class=\\"token punctuation\\">)</span>
+            <span class=\\"token punctuation\\">)</span>
+        <span class=\\"token punctuation\\">)</span>
+    <span class=\\"token punctuation\\">)</span>
+
+    <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">func</span> <span class=\\"token variable\\">$Main</span> <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">export</span> <span class=\\"token string\\">\\"Main\\"</span><span class=\\"token punctuation\\">)</span>
+        <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">call</span>
+            <span class=\\"token variable\\">$Foo</span>
+        <span class=\\"token punctuation\\">)</span>
+        <span class=\\"token punctuation\\">(</span><span class=\\"token keyword\\">drop</span><span class=\\"token punctuation\\">)</span>
+    <span class=\\"token punctuation\\">)</span>
+<span class=\\"token punctuation\\">)</span>
+<br />",
+      }
+    }
+    style={
+      Object {
+        "background": "none",
+        "border": 0,
+        "boxSizing": "inherit",
+        "display": "inherit",
+        "fontFamily": "inherit",
+        "fontSize": "inherit",
+        "fontStyle": "inherit",
+        "fontVariantLigatures": "inherit",
+        "fontWeight": "inherit",
+        "letterSpacing": "inherit",
+        "lineHeight": "inherit",
+        "margin": 0,
+        "overflowWrap": "break-word",
+        "paddingBottom": 0,
+        "paddingLeft": 0,
+        "paddingRight": 0,
+        "paddingTop": 0,
+        "pointerEvents": "none",
+        "position": "relative",
+        "tabSize": "inherit",
+        "textIndent": "inherit",
+        "textRendering": "inherit",
+        "textTransform": "inherit",
+        "whiteSpace": "pre-wrap",
+        "wordBreak": "keep-all",
+      }
+    }
+  />
+  <style
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "
+/**
+ * Reset the text fill color so that placeholder is visible
+ */
+.npm__react-simple-code-editor__textarea:empty {
+  -webkit-text-fill-color: inherit !important;
+}
+
+/**
+ * Hack to apply on some CSS on IE10 and IE11
+ */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  /**
+    * IE doesn't support '-webkit-text-fill-color'
+    * So we use 'color: transparent' to make the text transparent on IE
+    * Unlike other browsers, it doesn't affect caret color in IE
+    */
+  .npm__react-simple-code-editor__textarea {
+    color: transparent !important;
+  }
+
+  .npm__react-simple-code-editor__textarea::selection {
+    background-color: #accef7 !important;
+    color: transparent !important;
+  }
+}
+",
+      }
+    }
+    type="text/css"
+  />
+</div>
+`;
