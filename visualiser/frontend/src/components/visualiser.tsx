@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Button, Paper } from "@material-ui/core";
 import { CodeEditor } from "./code-editor";
@@ -65,7 +65,14 @@ const executeWebAssemblyText = async function (webAssemblyText: string) {
 
     const {instance} = await WebAssembly.instantiate(wasmBytes, importObject);
     instance.exports.Main();
-    return {logs, memory: instance.exports.memory.buffer};
+    return {
+        logs,
+        memory: (
+            instance.exports.memory
+                ? instance.exports.memory.buffer
+                : new Int8Array()
+        )
+    };
 };
 
 export const Visualiser = function () {
@@ -77,16 +84,27 @@ export const Visualiser = function () {
         ref
     );
 
+    const executeCode = async () => {
+        try {
+            const executionResult = await executeWebAssemblyText(code);
+            setExecutionResult(executionResult);
+        } catch (e) {
+            setExecutionResult({ logs: [`Failure: ${e.stack}`], memory: null })
+            console.error(e);
+        }
+    };
+
+    useEffect(() => {
+        executeCode();
+    }, [])
+
     return (
         <Box className={classes.root} ref={ref}>
             <Box className={classes.heading}>
                 <Button
                     color="primary"
                     variant="outlined"
-                    onClick={async () => {
-                        const executionResult = await executeWebAssemblyText(code);
-                        setExecutionResult(executionResult);
-                    }}
+                    onClick={executeCode}
                 >
                     Run File
                 </Button>
